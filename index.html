@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+<title>跳蚤越狱实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: lab bench — live jar on the left, control drawer on the right, analysis plates stacked below */
+:root{
+  --bg:#E9EEEF; --surface:#F6F8F8; --ink:#1A2326; --muted:#5D6B70; --line:#C9D3D6;
+  --amber:#B8650F; --mesh:#5A6A72; --food:#4F8530; --danger:#BE3B33; --glass:#D7E6EA;
+  --a-eat:#5E9A3A; --a-rest:#8FA9B3; --a-j1:#E8B04A; --a-j2:#D7832A; --a-j3:#A9461C;
+  --display:"Bricolage Grotesque","PingFang SC","Noto Sans SC",system-ui,sans-serif;
+  --body:"PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11171A; --surface:#192226; --ink:#E2E9EB; --muted:#93A3A9; --line:#2E3B40;
+  --amber:#EE9F45; --mesh:#93A6AE; --food:#7DBB55; --danger:#EC6A5F; --glass:#1E3036;
+  --a-eat:#6FAE47; --a-rest:#5D7883; --a-j1:#E6B656; --a-j2:#DD8A35; --a-j3:#C05A2C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11171A; --surface:#192226; --ink:#E2E9EB; --muted:#93A3A9; --line:#2E3B40;
+  --amber:#EE9F45; --mesh:#93A6AE; --food:#7DBB55; --danger:#EC6A5F; --glass:#1E3036;
+  --a-eat:#6FAE47; --a-rest:#5D7883; --a-j1:#E6B656; --a-j2:#DD8A35; --a-j3:#C05A2C; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 60px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,5vw,52px);line-height:1.05;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 em{font-style:normal;color:var(--amber)}
+h2{font-family:var(--display);font-weight:800;font-size:21px;margin:0;text-wrap:balance}
+.lede{max-width:66ch;color:var(--muted);margin:10px 0 0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.bench{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.bench{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;min-width:0}
+.jarbox canvas{width:100%;height:auto;display:block;border-radius:6px}
+.hud{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:12px}
+@media (max-width:620px){.hud{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.hud div{display:flex;flex-direction:column;gap:2px}
+.hud b{font-family:var(--mono);font-size:18px;font-variant-numeric:tabular-nums}
+.bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--amber);transition:width .2s}
+.bar.h i{background:var(--danger)} .bar.f i{background:var(--food)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--amber)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.primary{background:var(--amber);color:var(--surface);border-color:var(--amber);font-weight:600}
+.log{font-family:var(--mono);font-size:12px;color:var(--muted);height:116px;overflow:auto;margin-top:10px;border-top:1px dashed var(--line);padding-top:8px;font-variant-numeric:tabular-nums}
+.log div.bad{color:var(--danger)} .log div.good{color:var(--food)}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.presets button{font-size:13px;padding:4px 10px}
+.presets button.on{border-color:var(--amber);color:var(--amber)}
+.ctl{display:grid;grid-template-columns:7.5em minmax(0,1fr) 4.2em;gap:4px 10px;align-items:center;font-size:13.5px}
+.ctl label{color:var(--ink)} .ctl output{font-family:var(--mono);text-align:right;font-size:13px;font-variant-numeric:tabular-nums}
+.ctl input[type=range]{width:100%;accent-color:var(--amber)}
+.ctl .grp{grid-column:1/-1;margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
+.verdict{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px}
+@media (max-width:860px){.verdict{grid-template-columns:1fr}}
+.big{font-family:var(--display);font-weight:800;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.big small{font-size:18px;font-weight:500;color:var(--muted);margin-left:6px}
+.plan{font-size:15px;margin-top:12px;max-width:60ch}
+.plan .tok{display:inline-block;font-family:var(--mono);font-size:12.5px;padding:1px 7px;border-radius:4px;margin:2px 2px;color:#fff}
+.plan .sep{color:var(--muted);font-size:12px}
+.cmp{display:flex;flex-direction:column;gap:10px}
+.cmp .it{display:grid;grid-template-columns:8.5em minmax(0,1fr) 4.5em;gap:10px;align-items:center;font-size:13.5px}
+.cmp .tr{height:14px;background:var(--bg);border-radius:3px;overflow:hidden}
+.cmp .tr i{display:block;height:100%;background:var(--mesh)}
+.cmp .it.best .tr i{background:var(--amber)}
+.cmp .it span:last-child{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.stats{display:flex;flex-wrap:wrap;gap:22px;margin-top:16px}
+.stats div{display:flex;flex-direction:column}
+.stats b{font-family:var(--mono);font-size:20px;font-variant-numeric:tabular-nums}
+.stats span{font-size:12px;color:var(--muted)}
+.plates{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:860px){.plates{grid-template-columns:1fr}}
+.scroll{overflow-x:auto}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:10px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:12px;height:12px;border-radius:2px;display:inline-block}
+.note{font-size:13px;color:var(--muted);margin:6px 0 0;max-width:70ch}
+.rules{columns:2 300px;column-gap:32px;font-size:14px}
+.rules p{margin:0 0 10px;break-inside:avoid}
+.rules code{font-family:var(--mono);font-size:12.5px;background:var(--bg);padding:0 4px;border-radius:3px}
+.bellhead{display:flex;flex-wrap:wrap;gap:8px 22px;margin:14px 0 10px;font-size:13.5px}
+.bellhead b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.bell{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+table.bell th{text-align:left;font-weight:500;color:var(--muted);font-size:12px;padding:6px 10px;border-bottom:1px solid var(--line)}
+table.bell td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.bell td.m{font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+table.bell td.v{font-family:var(--mono);font-size:15px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+table.bell tr.best td{background:var(--bg)}
+table.bell tr.best td.v{color:var(--amber);font-weight:600}
+table.bell tr.na td{color:var(--muted)}
+table.bell .chip{display:inline-block;font-size:11px;padding:0 6px;border-radius:3px;color:#fff;margin-left:6px;vertical-align:1px}
+table.bell .act{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:0}
+button.ref{font:inherit;font-family:var(--mono);font-size:12.5px;padding:0;border:0;background:none;color:var(--ink);text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer}
+button.ref:hover{color:var(--amber)}
+.dead{color:var(--danger)}
+.jr{display:flex;flex-direction:column;gap:4px}
+.jr .jt{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.jr .jt b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.jr .tr{height:12px;background:var(--bg);border-radius:3px;overflow:hidden}
+.jr .tr i{display:block;height:100%;background:var(--mesh)}
+.jr.best .tr i{background:var(--amber)} .jr.best .jt b{color:var(--amber)}
+.jr.ref{opacity:.6}
+.jr .js{font-size:12px;color:var(--muted)}
+.jr .chip{font-size:11px;padding:0 6px;border-radius:3px;margin-left:8px;background:var(--amber);color:var(--surface)}
+#jail{gap:14px}
+.sj{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.sj span:not(.chip){color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+.sj .chip{font-size:11px;padding:0 6px;border-radius:3px;color:var(--surface)}
+.sj button{margin-left:auto;font-size:12px;padding:2px 8px}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:12px;padding:6px 8px;border-radius:5px;z-index:9;white-space:pre}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">动态规划 · 马尔可夫决策过程 · 博弈</div>
+    <h1>跳蚤越狱<em>实验室</em></h1>
+    <p class="lede">罐子里有一点食物，罐口有网。跳出去就是吃不完的世界，但每次撞网都会受伤、缩短寿命，每一跳还要花力气。网也可能变：某天突然被拿走，定时打开，或者随机打开。这一页用动态规划把每种处境下的最优选择精确算出来，再看看看守者该怎么安排开网，才能让跳蚤最难逃出去。</p>
+  </header>
+
+  <section class="bench">
+    <div class="panel jarbox">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px">
+        <h2>现场观察</h2>
+        <div class="row">
+          <button class="primary" id="btnPlay">暂停</button>
+          <button id="btnRestart">换一只跳蚤</button>
+          <label for="speed" class="eyebrow">速度</label>
+          <select id="speed"><option value="0.6">慢</option><option value="1" selected>正常</option><option value="2.5">快</option><option value="6">极快</option></select>
+        </div>
+      </div>
+      <canvas id="jar" width="560" height="400" aria-label="罐子和跳蚤的动画"></canvas>
+      <div class="hud">
+        <div><span class="eyebrow">第几天</span><b id="hDay">0</b></div>
+        <div><span class="eyebrow">能量</span><b id="hE">0</b><div class="bar"><i id="bE"></i></div></div>
+        <div><span class="eyebrow">健康</span><b id="hH">10</b><div class="bar h"><i id="bH"></i></div></div>
+        <div><span class="eyebrow">罐内食物</span><b id="hF">0</b><div class="bar f"><i id="bF"></i></div></div>
+        <div><span class="eyebrow">今天的网</span><b id="hN" style="font-size:15px">固定</b></div>
+      </div>
+      <div class="log" id="log" aria-live="polite"></div>
+    </div>
+
+    <div class="panel">
+      <h2 style="margin-bottom:10px">实验条件</h2>
+      <div class="presets" id="presets"></div>
+      <div class="ctl" id="ctl"></div>
+    </div>
+  </section>
+
+  <section class="panel verdict">
+    <div>
+      <div class="eyebrow" id="vLabel">最优策略下的预期寿命</div>
+      <div class="big" id="vBest">0<small>天</small></div>
+      <div class="plan" id="plan"></div>
+      <div class="stats" id="mc"></div>
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:10px">和几种“直觉策略”比较</div>
+      <div class="cmp" id="cmp"></div>
+      <p class="note" id="insight"></p>
+    </div>
+  </section>
+
+  <section class="panel" id="jailPanel">
+    <h2>看守者 vs 跳蚤：怎么开网，跳蚤最难逃？</h2>
+    <p class="note" id="jailIntro"></p>
+    <div class="cmp" id="jail" style="margin-top:14px"></div>
+    <p class="note" id="jailNote" style="margin-top:12px"></p>
+  </section>
+
+  <section class="panel" id="lhPanel">
+    <h2>习得性无助：网被悄悄拿走以后</h2>
+    <p class="note">这里的跳蚤不知道网有多密，只能从自己撞网的经历里估计（贝叶斯更新）：撞得越多，越相信网很密。网在某一天被悄悄拿走，跳蚤看不出来，只有再跳一次才会发现。它会不会撞怕了、从此不跳，就这样困死在一个早已没有网的罐子里？网的真实密度、撞网伤害、食物等沿用上面的设置。</p>
+    <div class="row" style="margin:12px 0 4px">
+      <button id="lhClassic">经典实验设置</button>
+      <label for="lhWho" class="eyebrow">演示</label>
+      <select id="lhWho"><option value="A">A · 认为网永远不会变</option><option value="B">B · 认为网可能被拿走</option><option value="C">C · 偶尔试探</option><option value="D">D · 撞 2 次就放弃</option></select>
+      <button class="primary" id="lhDemo">在现场观察里演示</button>
+      <button id="lhStop">回到普通模式</button>
+    </div>
+    <div class="ctl" id="lhCtl" style="max-width:560px;margin-top:8px"></div>
+    <div class="cmp" id="lhRows" style="margin-top:16px;gap:14px"></div>
+    <div class="plates" style="margin-top:18px">
+      <div style="min-width:0"><div class="eyebrow" style="margin-bottom:6px">A 越撞越悲观：估计的全力跳穿网率</div><div class="scroll"><svg id="lhC1"></svg></div></div>
+      <div style="min-width:0"><div class="eyebrow" id="lhC2t" style="margin-bottom:6px">B 隔得越久越敢再试</div><div class="scroll"><svg id="lhC2"></svg></div></div>
+    </div>
+    <p class="note">阴影表示在满血、能量满、罐里还有一半食物时，跳蚤仍然会选择跳；红色虚线是放弃（左图）或重新尝试（右图）的分界。</p>
+    <p class="note" id="lhNote" style="margin-top:10px;color:var(--ink)"></p>
+  </section>
+
+  <section class="plates">
+    <div class="panel">
+      <h2>策略地图</h2>
+      <p class="note">每个格子是一种处境：横轴是罐里剩多少食物，纵轴是跳蚤自己的能量。颜色是那一刻的最优动作。</p>
+      <div class="ctl" style="margin:10px 0 6px">
+        <label for="mapH">看健康值为</label><input type="range" id="mapH" min="1" max="10" value="10"><output id="mapHo">10</output>
+        <label for="mapN" class="mapN">看网的状态</label><input type="range" id="mapN" class="mapN" min="0" max="0" value="0"><output id="mapNo" class="mapN"></output>
+        <span class="mapN note" id="mapNl" style="grid-column:2/-1;margin:0"></span>
+      </div>
+      <div class="scroll"><svg id="map" role="img" aria-label="策略地图"></svg></div>
+      <div class="legend" id="legend"></div>
+      <p class="note">点任意一个格子，下面会展开这个处境的贝尔曼方程。</p>
+    </div>
+    <div class="panel">
+      <h2>网越密，越该怎么办？</h2>
+      <p class="note">其他条件不变，只改变（关着时的）网密度。实线是寿命，虚线是最优策略下最终逃出去的概率。</p>
+      <div class="scroll"><svg id="sweep" role="img" aria-label="网密度扫描图"></svg></div>
+      <div class="legend" id="legend2"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="scanPanel">
+    <h2>临界点扫描</h2>
+    <p class="note">选一个参数，其他条件保持上面的设置，把它从最小拉到最大，看寿命、逃出率和首跳日怎么变。突然变化的地方会被标出来：红色是寿命突变，灰色是行为翻转。</p>
+    <div class="row" style="margin:12px 0 8px"><label for="scanP" class="eyebrow">扫描参数</label><select id="scanP"></select></div>
+    <div class="scroll"><svg id="scanSvg"></svg></div>
+    <div class="legend"><span><i style="background:var(--amber)"></i>预期寿命（左轴）</span><span><i style="background:var(--danger)"></i>逃出概率（右轴，虚线）</span><span><i style="background:var(--a-j3)"></i>首跳日（点的颜色是跳的力度，× 表示不跳）</span><span><i style="background:var(--danger);opacity:.35"></i>寿命突变</span><span><i style="background:var(--mesh);opacity:.35"></i>行为翻转</span></div>
+    <p class="note" id="scanNote" style="color:var(--ink);margin-top:10px"></p>
+    <div id="scanList" style="margin-top:6px"></div>
+  </section>
+
+  <section class="panel" id="bellPanel">
+    <h2>贝尔曼方程展开</h2>
+    <p class="note" id="bellIntro"></p>
+    <div class="bellhead" id="bellState"></div>
+    <div class="scroll"><table class="bell" id="bell"></table></div>
+    <p class="note">表里带下划线的 V(…) 是另一个处境的价值，它们都是更早一步已经算好的格子，点一下可以跳过去继续往下追。网会变化时，明天的网状态有几种可能，就按概率加权。</p>
+  </section>
+
+  <section class="panel">
+    <h2 style="margin-bottom:12px">这个世界的规则</h2>
+    <div class="rules">
+      <p><b>状态。</b>跳蚤在罐内时的处境由能量 <code>e</code>（0–20）、健康 <code>h</code>（0–10）、罐内剩余食物 <code>f</code> 和网的状态 <code>n</code> 决定。能量归零饿死，健康归零死亡。</p>
+      <p><b>每天都可能自然死亡。</b>每天的死亡概率 = 基础死亡率 + 伤病系数 × 已损失的健康，再加上所在环境的风险（罐内闷热霉变，或罐外的天敌）。撞网会一直抬高这个概率；罐内风险让“一直等着”也有代价。</p>
+      <p><b>每天的选择。</b>吃一份食物（能量 +食物能量，罐内食物 −1）；休息（有一定概率恢复 1 点健康）；或者以轻 / 中 / 全力三档跳。所有动作都要先付每日代谢。</p>
+      <p><b>跳跃。</b>力度 a = 1、2、3，耗能 = 跳跃耗能 × a。穿网概率 = 1 − 网密度<sup>0.8a</sup>；撞网伤害随力度增加（1×、1.5×、2× 基础伤害）。网被拿走（密度 0）时一跳必过。</p>
+      <p><b>会变的网。</b>“开网”时网密度变成“开网时密度”。只开一次和定时打开是固定日程，跳蚤会数日子，所以总能预知。随机打开是每天独立抽签；成团打开是一旦打开会持续几天（马尔可夫链）。每种方式都从网关着开始。</p>
+      <p><b>看不看得见。</b>看得见时跳蚤每天知道网开没开。看不见时它只能根据规律和自己撞网的结果推测网开着的概率（贝叶斯更新），这个“信念”成了状态的一部分。</p>
+      <p><b>罐外。</b>食物无限，不再有饿死的问题，伤势也能慢慢恢复，但要承担罐外风险。罐外的预期寿命可以精确算出。</p>
+      <p><b>两种目标。</b>“活得最久”最大化预期寿命；“逃出去的概率最高”最大化最终到达罐外的概率，不在乎活多久。看守者 vs 跳蚤的排名用后者：跳蚤知道看守者的安排并做出最好的应对，看守者选让这个最好成绩最低的安排。</p>
+      <p><b>怎么求最优。</b>每个动作要么让罐内食物减少，要么让能量减少，所以按 (食物, 能量) 从小到大逐个做一次贝尔曼递推就能得到精确最优解。所有对比策略也用同一套方程算出。</p>
+    </div>
+  </section>
+</div>
+<div id="tip" hidden></div>
+
+<script>
+(function(){
+const EMAX=20, HMAX=10, BB=41;
+const ACT=[{k:'eat',n:'吃',c:'--a-eat'},{k:'rest',n:'休息',c:'--a-rest'},{k:'j1',n:'轻跳',c:'--a-j1'},{k:'j2',n:'中跳',c:'--a-j2'},{k:'j3',n:'全力跳',c:'--a-j3'}];
+const DEF={d:0.6,F0:12,e0:8,g:3,m:1,jc:1,dmg:2,h0:0.01,k:0.008,rho:0.002,rin:0.006,r:0.15,
+  obj:'life',sched:'const',dOpen:0,tau:0.1,L:1,off:20,vis:'yes',lhT:8,lhMu:0.5,lhQ:0.05};
+const SCHED=[['const','固定不变'],['once','某天打开一次'],['periodic','定时打开'],['random','随机打开'],['burst','成团打开']];
+const pct=v=>Math.round(v*100)+'%';
+const CTL=[
+  {grp:'跳蚤的目标'},
+  {id:'obj',n:'追求',type:'sel',opts:[['life','活得最久'],['escape','逃出去的概率最高']]},
+  {grp:'罐子'},
+  {id:'d',n:'网密度',min:0,max:0.95,step:0.05,fmt:pct},
+  {id:'dmg',n:'撞网伤害',min:1,max:5,step:1,fmt:v=>v+' 点'},
+  {id:'F0',n:'罐内食物',min:0,max:40,step:1,fmt:v=>v+' 份'},
+  {id:'g',n:'每份能量',min:1,max:6,step:1,fmt:v=>'+'+v},
+  {grp:'网的变化'},
+  {id:'sched',n:'变化方式',type:'sel',opts:SCHED},
+  {id:'dOpen',n:'开网时密度',min:0,max:0.9,step:0.05,fmt:v=>v===0?'没网':pct(v),show:s=>s!=='const'},
+  {id:'tau',n:'开网天数占比',min:0.05,max:0.5,step:0.05,fmt:pct,show:s=>['periodic','random','burst'].includes(s)},
+  {id:'L',n:'每次开几天',min:1,max:6,step:1,fmt:v=>v+' 天',show:s=>['once','periodic','burst'].includes(s)},
+  {id:'off',n:'第一次开网',min:0,max:60,step:1,fmt:v=>'第 '+v+' 天',show:s=>['once','periodic'].includes(s)},
+  {id:'vis',n:'看得见网吗',type:'sel',opts:[['yes','看得见'],['no','看不见']],show:s=>['random','burst'].includes(s)},
+  {grp:'跳蚤'},
+  {id:'e0',n:'初始能量',min:1,max:20,step:1,fmt:v=>v},
+  {id:'m',n:'每日代谢',min:1,max:3,step:1,fmt:v=>'−'+v},
+  {id:'jc',n:'跳跃耗能',min:1,max:3,step:1,fmt:v=>'×'+v},
+  {id:'r',n:'休息回血率',min:0,max:0.5,step:0.05,fmt:pct},
+  {grp:'死亡风险（每天）'},
+  {id:'h0',n:'基础死亡率',min:0.002,max:0.04,step:0.002,fmt:v=>(v*100).toFixed(1)+'%'},
+  {id:'k',n:'伤病系数',min:0,max:0.03,step:0.002,fmt:v=>(v*100).toFixed(1)+'%'},
+  {id:'rin',n:'罐内风险',min:0,max:0.05,step:0.002,fmt:v=>(v*100).toFixed(1)+'%'},
+  {id:'rho',n:'罐外风险',min:0,max:0.08,step:0.005,fmt:v=>(v*100).toFixed(1)+'%'},
+];
+const PRESETS=[
+  {n:'默认',p:{}},
+  {n:'稀疏网',p:{d:0.2}},
+  {n:'密网 + 粮多',p:{d:0.9,F0:40,dmg:3}},
+  {n:'外面很危险',p:{rho:0.03,F0:30}},
+  {n:'罐里闷热',p:{rin:0.025,d:0.75}},
+  {n:'钢丝网',p:{d:0.7,dmg:5,k:0.02}},
+  {n:'某天突然没网',p:{sched:'once',off:25,L:1,d:0.9,dmg:3}},
+  {n:'定时开网',p:{sched:'periodic',tau:0.1,L:1,off:9,d:0.85,obj:'escape'}},
+  {n:'随机开网',p:{sched:'random',tau:0.1,d:0.85,obj:'escape'}},
+  {n:'随机开网 · 看不见',p:{sched:'random',tau:0.1,d:0.85,vis:'no',obj:'escape'}},
+  {n:'成团开网',p:{sched:'burst',tau:0.1,L:4,d:0.85,obj:'escape'}},
+];
+let P={...DEF};
+
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const passD=(d,a)=>1-Math.pow(d,0.8*a);
+const dmgA=a=>[0,P.dmg,Math.ceil(1.5*P.dmg),2*P.dmg][a];
+const hz=h=>Math.min(1,P.h0+P.k*(HMAX-h));
+const periodT=()=>Math.max(P.L+1,Math.round(P.L/P.tau));
+
+// ---------- the net as a process ----------
+// every net exposes: n states, init, pp(i,j) pass prob, tr(i,j) next-state distribution
+// (j = jump strength that just failed, 0 = no new information), open(i) = P(open today), label/short
+function buildNet(){
+  const pc=P.d,po=P.dOpen,L=P.L,s=P.sched;
+  const det=(isOpen,next,init,label,short,extra)=>Object.assign({n:isOpen.length,blind:false,init,
+    pp:(i,j)=>passD(isOpen[i]?po:pc,j),tr:i=>next[i],open:i=>isOpen[i],label,short},extra||{});
+  if(s==='once'){
+    const off=P.off,n=off+L+1,isOpen=[],next=[];
+    for(let i=0;i<n;i++){isOpen.push(i>=off&&i<off+L?1:0);next.push([[1,Math.min(i+1,n-1)]]);}
+    return det(isOpen,next,0,
+      i=>i<off?`网关着，还有 ${off-i} 天开网`:i<off+L?`网开着（第 ${i-off+1}/${L} 天）`:'网已经关回去，不会再开',
+      i=>i<off?`${off-i}天后开`:i<off+L?'开':'永久关',{off});
+  }
+  if(s==='periodic'){
+    const T=periodT(),off=Math.min(P.off,T-L),isOpen=[],next=[];
+    for(let c=0;c<T;c++){isOpen.push(c<L?1:0);next.push([[1,(c+1)%T]]);}
+    return det(isOpen,next,off===0?0:T-off,
+      c=>c<L?`网开着（第 ${c+1}/${L} 天）`:`网关着，还有 ${T-c} 天开网`,
+      c=>c<L?'开':`${T-c}天后开`,{T,off});
+  }
+  if(s==='random'||s==='burst'){
+    const tau=P.tau,a=s==='random'?tau:1-1/L,bco=s==='random'?tau:Math.min(1,tau/(L*(1-tau)));
+    const markov={a,bco};
+    if(P.vis==='yes')return det([0,1],[[[1-bco,0],[bco,1]],[[1-a,0],[a,1]]],0,
+      i=>i?'网开着':'网关着',i=>i?'开':'关',{markov});
+    // blind flea: state = belief that the net is open today, on a grid of BB points
+    const interp=b=>{const x=Math.max(0,Math.min(1,b))*(BB-1),i0=Math.min(BB-2,Math.floor(x)),w=x-i0;
+      return w<1e-9?[[1,i0]]:w>1-1e-9?[[1,i0+1]]:[[1-w,i0],[w,i0+1]];};
+    const TR=[0,1,2,3].map(j=>Array.from({length:BB},(_,i)=>{
+      let b=i/(BB-1);
+      if(j){const fo=1-passD(po,j),fc=1-passD(pc,j),den=b*fo+(1-b)*fc;if(den>1e-12)b=b*fo/den;}
+      return interp(b*a+(1-b)*bco);}));
+    return {n:BB,blind:true,init:0,markov,
+      pp:(i,j)=>{const b=i/(BB-1);return b*passD(po,j)+(1-b)*passD(pc,j);},
+      tr:(i,j)=>TR[j][i],open:i=>i/(BB-1),
+      label:i=>`跳蚤估计今天网开着的概率是 ${pct(i/(BB-1))}`,short:i=>`估${pct(i/(BB-1))}开`};
+  }
+  return det([0],[[[1,0]]],0,()=>'网一直不变',()=>'',{});
+}
+
+// exact DP over (f, e, h, n); allow(a,e,f,h,n,net) restricts actions for baseline strategies
+function solve(F0,allow,net){
+  const NN=net.n,SE=(HMAX+2)*NN,SF=(EMAX+1)*SE,N=(F0+1)*SF;
+  const V=new Float32Array(N),X=new Float32Array(N),A=new Int8Array(N);
+  const id=(e,f,h,n)=>f*SF+e*SE+h*NN+n;
+  const Vo=new Float64Array(HMAX+2);
+  for(let h=HMAX;h>=1;h--){const q=Math.min(1,hz(h)+P.rho),up=h===HMAX?0:P.r;
+    Vo[h]=(1+(1-q)*up*(h===HMAX?0:Vo[h+1]))/(1-(1-q)*(1-up));}
+  const EV=(arr,e,f,h,lst)=>{if(e<=0||h<=0)return 0;const b=f*SF+e*SE+h*NN;let s=0;for(let i=0;i<lst.length;i++)s+=lst[i][0]*arr[b+lst[i][1]];return s;};
+  const esc=P.obj==='escape',r=P.r;
+  for(let f=0;f<=F0;f++)for(let e=1;e<=EMAX;e++)for(let h=1;h<=HMAX;h++){
+    const s=1-Math.min(1,hz(h)+P.rin);
+    for(let n=0;n<NN;n++){
+      const t0=net.tr(n,0);let bk=-1,bk2=-1,ba=-1,bv=1,bx=0;
+      for(let a=0;a<5;a++){
+        if(allow&&!allow(a,e,f,h,n,net))continue;
+        let v,x;
+        if(a===0){if(f<=0)continue;const e2=Math.min(EMAX,e-P.m+P.g);v=1+s*EV(V,e2,f-1,h,t0);x=s*EV(X,e2,f-1,h,t0);}
+        else if(a===1){const e2=e-P.m,h2=Math.min(HMAX,h+1);
+          v=1+s*(r*EV(V,e2,f,h2,t0)+(1-r)*EV(V,e2,f,h,t0));x=s*(r*EV(X,e2,f,h2,t0)+(1-r)*EV(X,e2,f,h,t0));}
+        else{const j=a-1,e2=e-P.m-P.jc*j;if(e2<0)continue;const p=net.pp(n,j),tj=net.tr(n,j),h2=h-dmgA(j);
+          v=1+s*(p*Vo[h]+(1-p)*EV(V,e2,f,h2,tj));x=s*(p+(1-p)*EV(X,e2,f,h2,tj));}
+        const k1=esc?x:v,k2=esc?v:x,eps=esc?1e-6:1e-4;
+        if(k1>bk+eps||(Math.abs(k1-bk)<=eps&&k2>bk2)){bk=k1;bk2=k2;ba=a;bv=v;bx=x;}
+      }
+      if(ba<0){ba=1;bv=1;bx=0;}
+      const i=id(e,f,h,n);V[i]=bv;X[i]=bx;A[i]=ba;
+    }
+  }
+  return {V,X,A,Vo,id,F0,net};
+}
+
+let NET=null,SOL=null;
+const STRATS=[
+  {n:'最优策略',allow:null},
+  {n:'永远不跳',allow:a=>a<2},
+  {n:'吃光再跳',allow:(a,e,f)=>a<2||f===0},
+  {n:'一上来就全力跳',allow:(a,e,f)=>{const can=e-P.m-3*P.jc>=0;return can?a===4:a<2;}},
+  {n:'只在网开时跳',allow:(a,e,f,h,n,net)=>a<2||net.open(n)>=0.5,netOnly:true},
+];
+
+// ---------- controls ----------
+const ctlEl=document.getElementById('ctl');
+CTL.forEach(c=>{
+  if(c.grp){const d=document.createElement('div');d.className='grp eyebrow';d.textContent=c.grp;ctlEl.appendChild(d);return;}
+  if(c.type==='sel'){
+    ctlEl.insertAdjacentHTML('beforeend',`<label for="c_${c.id}" class="r_${c.id}">${c.n}</label><select id="c_${c.id}" class="r_${c.id}" style="grid-column:2/-1">${c.opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select>`);
+    document.getElementById('c_'+c.id).addEventListener('change',e=>{P[c.id]=e.target.value;markPreset(-1);sync();schedule(true);});
+    return;
+  }
+  ctlEl.insertAdjacentHTML('beforeend',`<label for="c_${c.id}" class="r_${c.id}">${c.n}</label><input type="range" id="c_${c.id}" class="r_${c.id}" min="${c.min}" max="${c.max}" step="${c.step}"><output id="o_${c.id}" class="r_${c.id}"></output>`);
+  const inp=document.getElementById('c_'+c.id);
+  inp.addEventListener('input',()=>{P[c.id]=+inp.value;markPreset(-1);sync();schedule(true);});
+});
+function sync(){CTL.forEach(c=>{if(c.grp)return;
+  document.getElementById('c_'+c.id).value=P[c.id];
+  if(c.type!=='sel'){let t=c.fmt(P[c.id]);if(c.id==='off'&&P.sched==='periodic')t='第 '+Math.min(P.off,periodT()-P.L)+' 天';document.getElementById('o_'+c.id).textContent=t;}
+  const vis=!c.show||c.show(P.sched);document.querySelectorAll('.r_'+c.id).forEach(el=>el.hidden=!vis);
+});syncLh();}
+const prEl=document.getElementById('presets');
+PRESETS.forEach((p,i)=>{const b=document.createElement('button');b.textContent=p.n;b.onclick=()=>{P={...DEF,...p.p};markPreset(i);sync();schedule(true);};prEl.appendChild(b);});
+function markPreset(i){prEl.querySelectorAll('button').forEach((b,j)=>b.classList.toggle('on',j===i));}
+markPreset(0);
+document.getElementById('legend').innerHTML=ACT.map(a=>`<span><i style="background:var(${a.c})"></i>${a.n}</span>`).join('');
+
+// ---------- analysis ----------
+const esc=()=>P.obj==='escape';
+const i0=so=>so.id(P.e0,P.F0,HMAX,so.net.init);
+const metric=so=>esc()?so.X[i0(so)]:so.V[i0(so)];
+const fmtM=v=>esc()?(v*100).toFixed(1)+'%':v.toFixed(1)+' 天';
+function likelyNext(lst){let b=lst[0];for(const x of lst)if(x[0]>b[0])b=x;return b[1];}
+function planText(){
+  let e=P.e0,f=P.F0,h=HMAX,n=NET.init,seq=[],guard=0;
+  while(guard++<90&&e>0&&h>0){
+    const a=SOL.A[SOL.id(e,f,h,n)],op=NET.open(n)>=0.5&&P.sched!=='const';
+    seq.push({a,op});
+    if(a===0){e=Math.min(EMAX,e-P.m+P.g);f--;n=likelyNext(NET.tr(n,0));}
+    else if(a===1){e-=P.m;n=likelyNext(NET.tr(n,0));}
+    else{const j=a-1;e=e-P.m-P.jc*j;h-=dmgA(j);seq.push({hit:1});n=likelyNext(NET.tr(n,j));}
+  }
+  const out=[];let i=0;
+  while(i<seq.length&&out.length<16){
+    const x=seq[i];
+    if(x.hit){out.push('<span class="sep">若失败 ↓</span>');i++;continue;}
+    let k=1;while(seq[i+k]&&seq[i+k].a===x.a&&seq[i+k].op===x.op)k++;
+    out.push(`<span class="tok" style="background:var(${ACT[x.a].c})${x.op?';outline:2px solid var(--food);outline-offset:1px':''}">${ACT[x.a].n}${k>1?' ×'+k:''}${x.op?' · 网开':''}</span>`);
+    i+=k;
+  }
+  const jumps=seq.some(x=>x.a>=2);
+  const cond=P.sched==='const'?'假设每一跳都撞网的最坏情况':'假设每一跳都失败，网按最可能的方式变化';
+  const pre=jumps?`从开局起，最优的行动顺序（${cond}）：`:'最优选择是<b>永远不跳</b>，守着罐子里的食物过完一生：';
+  return pre+'<br>'+out.join(' ')+(i<seq.length?' <span class="sep">…</span>':'')+(jumps?'':' <span class="sep">→ 饿死或老死</span>');
+}
+
+// ---------- flea simulation (shared by Monte Carlo and the animation) ----------
+function newFlea(net){return {e:P.e0,f:P.F0,h:HMAX,day:0,alive:true,out:false,hits:0,escDay:0,n:net.init,tn:0,b:0,escOpen:false};}
+const infoIdx=(s,net)=>net.blind?Math.round(s.b*(BB-1)):s.n;
+const trueOpen=(s,net)=>net.blind?s.tn===1:net.open(s.n)>=0.5;
+const truePass=(s,net,j)=>net.blind?passD(s.tn?P.dOpen:P.d,j):net.pp(s.n,j);
+function advanceNet(s,net,failJ){
+  if(net.blind){
+    const {a,bco}=net.markov;let b=s.b;
+    if(failJ){const fo=1-passD(P.dOpen,failJ),fc=1-passD(P.d,failJ),den=b*fo+(1-b)*fc;if(den>1e-12)b=b*fo/den;}
+    s.b=b*a+(1-b)*bco;s.tn=Math.random()<(s.tn?a:bco)?1:0;
+  }else{
+    const lst=net.tr(s.n,failJ||0);let u=Math.random();
+    for(const [p,n] of lst){if((u-=p)<=0){s.n=n;return;}}s.n=lst[lst.length-1][1];
+  }
+}
+function stepFlea(s,ctx){
+  const sol=ctx?ctx.sol:SOL,net=ctx?ctx.net:NET;
+  if(!s.alive)return null;
+  if(s.out){
+    const q=Math.min(1,hz(s.h)+P.rho);s.day++;
+    if(Math.random()<q){s.alive=false;return {t:'dieOut'};}
+    if(s.h<HMAX&&Math.random()<P.r){s.h++;return {t:'outHeal'};}
+    return {t:'outLive'};
+  }
+  s.day++;
+  const open=trueOpen(s,net);
+  if(Math.random()<hz(s.h)+P.rin){s.alive=false;return {t:'die',open};}
+  const a=sol.A[sol.id(s.e,s.f,s.h,infoIdx(s,net))];
+  if(a===0){s.e=Math.min(EMAX,s.e-P.m+P.g);s.f--;advanceNet(s,net,0);return {t:'eat',open};}
+  if(a===1){s.e-=P.m;let healed=false;if(s.h<HMAX&&Math.random()<P.r){s.h++;healed=true;}
+    if(s.e<=0){s.alive=false;return {t:'starve',open};}advanceNet(s,net,0);return {t:'rest',healed,open};}
+  const j=a-1;s.e=s.e-P.m-P.jc*j;
+  if(Math.random()<truePass(s,net,j)){s.out=true;s.escDay=s.day;s.escOpen=open;return {t:'escape',j,open};}
+  s.h-=dmgA(j);s.hits++;
+  if(s.h<=0){s.alive=false;return {t:'hitDie',j,open};}
+  if(s.e<=0){s.alive=false;return {t:'hitStarve',j,open};}
+  advanceNet(s,net,j);
+  return {t:'hit',j,open};
+}
+function monteCarlo(n,ctx){
+  const net=ctx?ctx.net:NET;let life=0,esc=0,hits=0,escDay=0,escOpen=0;
+  for(let r=0;r<n;r++){
+    const s=newFlea(net);let g=0;
+    while(s.alive&&g++<5000)stepFlea(s,ctx);
+    life+=s.day;if(s.out){esc++;escDay+=s.escDay;if(s.escOpen)escOpen++;}hits+=s.hits;
+  }
+  return {life:life/n,esc:esc/n,hits:hits/n,escDay:esc?escDay/esc:0,escOpen:esc?escOpen/esc:0};
+}
+
+let recT=0;
+function schedule(restart){clearTimeout(recT);recT=setTimeout(()=>recompute(restart),70);}
+function recompute(restart){
+  const prevN=NET?NET.n:-1;
+  NET=buildNet();SOL=solve(P.F0,null,NET);
+  const strats=STRATS.filter(s=>!s.netOnly||P.sched!=='const');
+  const sols=strats.map(s=>s.allow?solve(P.F0,s.allow,NET):SOL);
+  const vals=sols.map(metric);
+  document.getElementById('vLabel').textContent=esc()?'最优策略下逃出去的概率':'最优策略下的预期寿命';
+  document.getElementById('vBest').innerHTML=esc()?(vals[0]*100).toFixed(1)+'<small>%</small>':vals[0].toFixed(1)+'<small>天</small>';
+  document.getElementById('plan').innerHTML=planText();
+  const mx=Math.max(...vals,1e-9);
+  document.getElementById('cmp').innerHTML=strats.map((s,i)=>`<div class="it ${i===0?'best':''}"><span>${s.n}</span><div class="tr"><i style="width:${(vals[i]/mx*100).toFixed(1)}%"></i></div><span>${fmtM(vals[i])}</span></div>`).join('');
+  const mc=monteCarlo(3000);
+  const k0=i0(SOL);
+  document.getElementById('mc').innerHTML=(esc()?`<div><b>${SOL.V[k0].toFixed(1)}</b><span>这个策略下的预期寿命（天）</span></div>`:`<div><b>${(SOL.X[k0]*100).toFixed(0)}%</b><span>最终逃出的概率</span></div>`)+
+    `<div><b>${mc.hits.toFixed(2)}</b><span>平均撞网次数</span></div><div><b>${mc.esc?('第 '+mc.escDay.toFixed(1)+' 天'):'—'}</b><span>逃出者的平均越狱日</span></div>`+
+    (P.sched!=='const'&&mc.esc?`<div><b>${pct(mc.escOpen)}</b><span>逃出时网正开着的比例</span></div>`:'')+
+    `<div><b>${mc.life.toFixed(1)}</b><span>3000 只模拟跳蚤的平均寿命</span></div>`;
+  let t='';
+  if(!esc()){
+    const [vb,vs,ve,vj]=vals,gain=x=>((vb/x-1)*100).toFixed(0)+'%';
+    t=`在罐外满血时预期还能活 ${SOL.Vo[HMAX].toFixed(0)} 天；只靠罐内食物最多撑 ${(P.e0+P.F0*P.g)/P.m|0} 天左右的能量。`;
+    if(P.sched!=='const'&&vb-vs>=0.05){const vo=vals[4];
+      t+=Math.abs(vb-vo)<0.05?'最优解就是等网开：网关着时吃饭、休息攒能量，网一开就跳。':`最优策略比“只在网开时跳”多活 ${gain(vo)}：等下一次开网的代价太大时，直接硬跳更划算。`;}
+    else if(vb-vs<0.05)t+='在这组条件下跳出去不划算，冒险的代价比外面的好处大。';
+    else if(Math.abs(vb-vj)<0.05)t+='直接全力跳已经是最优：网够稀，越早出去越好。';
+    else if(Math.abs(vb-ve)<0.05)t+='最优解就是先把罐里吃干净再跳：罐内足够安全，没必要提早冒险。';
+    else t+=`最优策略比“永远不跳”多活 ${gain(vs)}，比“一上来就全力跳”多活 ${gain(vj)}。`;
+  }else{
+    const keep=P.obj;P.obj='life';const lifeSol=solve(P.F0,null,NET);P.obj=keep;
+    const kl=i0(lifeSol);
+    t=`追求逃出概率时，逃出率 ${(SOL.X[k0]*100).toFixed(1)}%，预期寿命 ${SOL.V[k0].toFixed(1)} 天；如果改为追求活得最久，逃出率是 ${(lifeSol.X[kl]*100).toFixed(1)}%，寿命 ${lifeSol.V[kl].toFixed(1)} 天。`;
+    const dv=lifeSol.V[kl]-SOL.V[k0];
+    if(dv>0.5)t+=`多出来的逃出机会是用 ${dv.toFixed(1)} 天寿命换来的。`;
+    else t+='两个目标在这里基本不冲突。';
+  }
+  if(P.sched!=='const'&&mc.esc){
+    t+=` 成功逃出的跳蚤里有 ${pct(mc.escOpen)} 是趁网开着出去的。`;
+    if(NET.blind)t+='跳蚤看不见网，只能按自己推测的“网开着的概率”行动，所以常常白跳。';
+  }
+  document.getElementById('insight').textContent=t;
+  if(NET.n!==prevN||+mapN.value>=NET.n){mapN.max=NET.n-1;mapN.value=NET.init;}
+  if(SEL)SEL.n=Math.min(SEL.n,NET.n-1);
+  document.querySelectorAll('.mapN').forEach(el=>el.hidden=P.sched==='const');
+  updMapN();drawMap();renderBell();
+  runSweep();runJail();runLearn();scanOptions();runScan();
+  if(restart)restartSim();
+}
+
+// ---------- policy map ----------
+const mapH=document.getElementById('mapH'),mapN=document.getElementById('mapN');
+function updMapN(){document.getElementById('mapNo').textContent=mapN.value;document.getElementById('mapNl').textContent=NET.label(+mapN.value);}
+mapH.addEventListener('input',()=>{document.getElementById('mapHo').textContent=mapH.value;if(SEL)SEL.h=+mapH.value;drawMap();renderBell();});
+mapN.addEventListener('input',()=>{updMapN();if(SEL)SEL.n=+mapN.value;drawMap();renderBell();});
+const tip=document.getElementById('tip');
+const cellSize=()=>Math.max(9,Math.min(22,Math.floor(440/(P.F0+1))));
+function drawMap(){
+  const svg=document.getElementById('map'),H=+mapH.value,NS=+mapN.value,F=P.F0;
+  const cell=cellSize(),L=34,T=8,ch=cell/1.4,w=L+cell*(F+1)+6,hgt=T+EMAX*ch+34;
+  let s=`<svg id="map" role="img" aria-label="策略地图" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${hgt}" width="${w}" height="${hgt}" style="cursor:pointer">`;
+  for(let e=1;e<=EMAX;e++)for(let f=0;f<=F;f++){
+    const a=SOL.A[SOL.id(e,f,H,NS)];
+    s+=`<rect x="${L+f*cell}" y="${T+(EMAX-e)*ch}" width="${cell-1}" height="${ch-1}" fill="var(${ACT[a].c})" data-e="${e}" data-f="${f}"/>`;
+  }
+  s+=`<rect id="cur" x="-99" y="-99" width="${cell-1}" height="${ch-1}" fill="none" stroke="var(--ink)" stroke-width="2"/>`;
+  s+=`<rect id="sel" x="-99" y="-99" width="${cell+1}" height="${ch+1}" fill="none" stroke="var(--surface)" stroke-width="2" stroke-dasharray="3 2"/>`;
+  for(let e=5;e<=EMAX;e+=5)s+=`<text x="${L-6}" y="${T+(EMAX-e)*ch+ch*0.75}" text-anchor="end">${e}</text>`;
+  const stepF=F>20?10:5;
+  for(let f=0;f<=F;f+=stepF)s+=`<text x="${L+f*cell+cell/2}" y="${T+EMAX*ch+14}" text-anchor="middle">${f}</text>`;
+  s+=`<text x="${L+cell*(F+1)/2}" y="${hgt-4}" text-anchor="middle">罐内剩余食物（份）</text>`;
+  s+=`<text x="10" y="${T+EMAX*ch/2}" text-anchor="middle" transform="rotate(-90 10 ${T+EMAX*ch/2})">能量</text></svg>`;
+  svg.outerHTML=s;
+  const ns=document.getElementById('map');
+  ns.addEventListener('mousemove',ev=>{
+    const r=ev.target.closest('rect[data-e]');if(!r){tip.hidden=true;return;}
+    const e=+r.dataset.e,f=+r.dataset.f,i=SOL.id(e,f,H,NS);
+    tip.textContent=`能量 ${e} · 食物 ${f} · 健康 ${H}${P.sched!=='const'?'\n'+NET.label(NS):''}\n最优：${ACT[SOL.A[i]].n}\n预期寿命 ${SOL.V[i].toFixed(1)} 天\n逃出概率 ${(SOL.X[i]*100).toFixed(0)}%`;
+    tip.hidden=false;tip.style.left=Math.min(innerWidth-220,ev.clientX+14)+'px';tip.style.top=(ev.clientY+14)+'px';
+  });
+  ns.addEventListener('mouseleave',()=>tip.hidden=true);
+  ns.addEventListener('click',ev=>{const r=ev.target.closest('rect[data-e]');if(!r)return;SEL={e:+r.dataset.e,f:+r.dataset.f,h:H,n:NS};markSel();renderBell();});
+  markCur();markSel();
+}
+function markCur(){
+  const c=document.getElementById('cur');if(!c||!sim)return;
+  const cell=cellSize(),ch=cell/1.4,s=sim.s;
+  if(!sim.learn&&s.alive&&!s.out&&s.h===+mapH.value&&infoIdx(s,NET)===+mapN.value&&s.e>0){c.setAttribute('x',34+s.f*cell);c.setAttribute('y',8+(EMAX-s.e)*ch);}
+  else c.setAttribute('x',-99);
+}
+
+// ---------- Bellman breakdown ----------
+let SEL=null;
+function markSel(){
+  const c=document.getElementById('sel');if(!c||!SEL)return;
+  const cell=cellSize(),ch=cell/1.4;
+  if(SEL.h===+mapH.value&&SEL.n===+mapN.value){c.setAttribute('x',34+SEL.f*cell-1);c.setAttribute('y',8+(EMAX-SEL.e)*ch-1);}
+  else c.setAttribute('x',-99);
+}
+function renderBell(){
+  if(!SEL)SEL={e:P.e0,f:P.F0,h:+mapH.value,n:NET.init};
+  SEL.f=Math.min(SEL.f,P.F0);SEL.n=Math.min(SEL.n,NET.n-1);
+  const {e,f,h,n}=SEL,o=SOL,E=esc(),arr=E?o.X:o.V;
+  const fx=v=>E?v.toFixed(3):v.toFixed(1);
+  const sym=E?'X':'V',one=E?'0':'1';
+  const nl=k=>P.sched==='const'?'':'·'+NET.short(k);
+  const val=(e2,f2,h2,k)=>(e2<=0||h2<=0)?0:arr[o.id(e2,f2,h2,k)];
+  const ref=(e2,f2,h2,k)=>h2<=0?'<span class="dead">死亡</span>':e2<=0?'<span class="dead">饿死</span>':`<button class="ref" data-e="${e2}" data-f="${f2}" data-h="${h2}" data-n="${k}">${sym}(能${e2}·粮${f2}·血${h2}${nl(k)})</button>`;
+  // expectation over tomorrow's net state
+  const ex=(e2,f2,h2,lst)=>{
+    const v=lst.reduce((s,[p,k])=>s+p*val(e2,f2,h2,k),0);
+    if(lst.length===1)return {t:ref(e2,f2,h2,lst[0][1]),v};
+    return {t:'( '+lst.map(([p,k])=>`${p.toFixed(2)}×${ref(e2,f2,h2,k)}`).join(' + ')+' )',v};
+  };
+  const q=Math.min(1,hz(h)+P.rin),s=1-q,S=s.toFixed(3),r=P.r,t0=NET.tr(n,0);
+  const rows=[];
+  if(f>0){const e2=Math.min(EMAX,e-P.m+P.g),X=ex(e2,f-1,h,t0);
+    rows.push({a:0,eq:`${one} + ${S} × ${X.t}`,num:`${one} + ${S} × ${fx(X.v)}`,v:(E?0:1)+s*X.v,why:`能量 ${e}−${P.m}+${P.g}${e-P.m+P.g>EMAX?'（满了，多的浪费）':''}，食物 −1`});}
+  else rows.push({a:0,na:'罐里没有食物了'});
+  {const e2=e-P.m,h2=Math.min(HMAX,h+1),A=ex(e2,f,h,t0);
+    if(h===HMAX||r===0||e2<=0)rows.push({a:1,eq:`${one} + ${S} × ${A.t}`,num:`${one} + ${S} × ${fx(A.v)}`,v:(E?0:1)+s*A.v,why:`能量 −${P.m}${h===HMAX?'，已满血':''}`});
+    else{const B=ex(e2,f,h2,t0);rows.push({a:1,eq:`${one} + ${S} × [ ${r.toFixed(2)} × ${B.t} + ${(1-r).toFixed(2)} × ${A.t} ]`,
+      num:`${one} + ${S} × [ ${r.toFixed(2)} × ${fx(B.v)} + ${(1-r).toFixed(2)} × ${fx(A.v)} ]`,v:(E?0:1)+s*(r*B.v+(1-r)*A.v),why:`能量 −${P.m}，${pct(r)} 概率回 1 点血`});}}
+  for(let j=1;j<=3;j++){
+    const cost=P.m+P.jc*j,e2=e-cost;
+    if(e2<0){rows.push({a:j+1,na:`能量不够（需要 ${cost}，现在 ${e}）`});continue;}
+    const p=NET.pp(n,j),h2=h-dmgA(j),out=E?1:o.Vo[h],B=ex(e2,f,h2,NET.tr(n,j));
+    rows.push({a:j+1,eq:`${one} + ${S} × [ ${p.toFixed(2)} × ${E?'1（逃出）':`罐外(血${h})`} + ${(1-p).toFixed(2)} × ${B.t} ]`,
+      num:`${one} + ${S} × [ ${p.toFixed(2)} × ${fx(out)} + ${(1-p).toFixed(2)} × ${fx(B.v)} ]`,v:(E?0:1)+s*(p*out+(1-p)*B.v),
+      why:`能量 −${cost}；穿网 ${pct(p)}，撞网 −${dmgA(j)} 血`});
+  }
+  const best=o.A[o.id(e,f,h,n)];
+  document.getElementById('bellIntro').textContent=E?
+    '目标是逃出概率时：一个处境的价值 X = 活过今天的概率 × 明天各种可能结果的 X（按概率加权）；跳出去记为 1，死在罐里记为 0。每个动作算一遍，取最大的那个。':
+    '一个处境的价值 V = 今天活下来的 1 天 + 活过今天的概率 × 明天各种可能结果的价值（按概率加权）。每个动作算一遍，取最大的那个。';
+  document.getElementById('bellState').innerHTML=`<span>处境：能量 <b>${e}</b> · 罐内食物 <b>${f}</b> · 健康 <b>${h}</b></span>`+
+    (P.sched!=='const'?`<span>${NET.label(n)}</span>`:'')+
+    `<span>今天活下来的概率 = 1 − (${(P.h0*100).toFixed(1)}% + ${(P.k*100).toFixed(1)}%×${HMAX-h} + ${(P.rin*100).toFixed(1)}%) = <b>${S}</b></span>`+
+    (E?'':`<span>罐外(血${h}) = 跳出去后的预期寿命 <b>${o.Vo[h].toFixed(1)}</b> 天</span>`);
+  document.getElementById('bell').innerHTML=`<tr><th>动作</th><th>方程</th><th>代入数字</th><th style="text-align:right">${E?'逃出概率':'预期寿命'}</th></tr>`+
+    rows.map(x=>{const A=ACT[x.a];
+      if(x.na)return `<tr class="na"><td><i class="act" style="background:var(${A.c})"></i>${A.n}</td><td colspan="3">不可选：${x.na}</td></tr>`;
+      const isB=x.a===best;
+      return `<tr class="${isB?'best':''}"><td style="white-space:nowrap"><i class="act" style="background:var(${A.c})"></i>${A.n}${isB?`<span class="chip" style="background:var(--amber)">最优</span>`:''}<div class="note" style="margin:2px 0 0;font-size:11.5px">${x.why}</div></td><td class="m">${x.eq}</td><td class="m">${x.num}</td><td class="v">${E?(x.v*100).toFixed(1)+'%':x.v.toFixed(1)+' 天'}</td></tr>`;}).join('');
+  markSel();
+}
+document.getElementById('bell').addEventListener('click',ev=>{
+  const b=ev.target.closest('button.ref');if(!b)return;
+  SEL={e:+b.dataset.e,f:+b.dataset.f,h:+b.dataset.h,n:+b.dataset.n};
+  mapH.value=SEL.h;document.getElementById('mapHo').textContent=SEL.h;mapN.value=SEL.n;updMapN();drawMap();renderBell();
+});
+
+// ---------- density sweep (async so sliders stay responsive) ----------
+let sweepJob=0;
+const tick=()=>new Promise(r=>setTimeout(r,0));
+async function runSweep(){
+  const my=++sweepJob,keep={...P},pts=[];
+  for(const d of [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.85,0.9,0.95]){
+    await tick();if(my!==sweepJob)return;
+    P={...keep,d};const net=buildNet(),so=solve(P.F0,null,net);
+    const st=solve(P.F0,STRATS[1].allow,net),sj=solve(P.F0,STRATS[3].allow,net);
+    pts.push({d,b:so.V[i0(so)],s:st.V[i0(st)],j:sj.V[i0(sj)],x:so.X[i0(so)]});P=keep;
+  }
+  drawSweep(pts);
+}
+function drawSweep(pts){
+  const keep=P.d;
+  const W=480,H=260,L=40,R=40,T=14,B=34,iw=W-L-R,ih=H-T-B;
+  const ymax=Math.max(...pts.map(p=>Math.max(p.b,p.s,p.j)))*1.08,nice=ymax>100?50:ymax>40?20:10,top=Math.ceil(ymax/nice)*nice;
+  const X=d=>L+d/0.95*iw,Y=v=>T+ih-(v/top)*ih,Y2=p=>T+ih-p*ih;
+  let s=`<svg id="sweep" role="img" aria-label="网密度扫描图" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">`;
+  for(let v=0;v<=top;v+=nice)s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${v}</text>`;
+  for(let p=0;p<=1;p+=0.5)s+=`<text x="${W-R+6}" y="${Y2(p)+3}">${p*100}%</text>`;
+  for(let d=0;d<=0.9;d+=0.3)s+=`<text x="${X(d)}" y="${H-18}" text-anchor="middle">${Math.round(d*100)}%</text>`;
+  s+=`<text x="${L+iw/2}" y="${H-3}" text-anchor="middle">网密度（关着时）</text><text x="${L}" y="${T-4}" text-anchor="start">天</text>`;
+  s+=`<line x1="${X(keep)}" x2="${X(keep)}" y1="${T}" y2="${T+ih}" stroke="var(--amber)" stroke-dasharray="2 3"/>`;
+  const path=(f,y)=>pts.map((p,i)=>(i?'L':'M')+X(p.d).toFixed(1)+' '+y(f(p)).toFixed(1)).join('');
+  s+=`<path d="${path(p=>p.s,Y)}" fill="none" stroke="var(--a-rest)" stroke-width="2"/>`;
+  s+=`<path d="${path(p=>p.j,Y)}" fill="none" stroke="var(--a-j1)" stroke-width="2"/>`;
+  s+=`<path d="${path(p=>p.x,Y2)}" fill="none" stroke="var(--danger)" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+  s+=`<path d="${path(p=>p.b,Y)}" fill="none" stroke="var(--amber)" stroke-width="3"/>`;
+  const cp=pts.reduce((a,p)=>Math.abs(p.d-keep)<Math.abs(a.d-keep)?p:a);
+  s+=`<circle cx="${X(cp.d)}" cy="${Y(cp.b)}" r="4" fill="var(--amber)"/></svg>`;
+  document.getElementById('sweep').outerHTML=s;
+  document.getElementById('legend2').innerHTML=`<span><i style="background:var(--amber)"></i>最优策略（当前目标）的寿命</span><span><i style="background:var(--a-rest)"></i>永远不跳</span><span><i style="background:var(--a-j1)"></i>一上来就全力跳</span><span><i style="background:var(--danger)"></i>逃出概率（右轴）</span>`;
+}
+
+// ---------- jailer vs flea ----------
+let jailJob=0;
+async function runJail(){
+  const my=++jailJob,keep={...P},el=document.getElementById('jail');
+  const tau=keep.tau,Tof=L=>Math.max(L+1,Math.round(L/tau));
+  document.getElementById('jailIntro').innerHTML=`看守者每隔一段时间必须开网（喂食、清洁、透气），开网的天数平均要占 <b>${pct(tau)}</b>，开网时网密度变成 <b>${keep.dOpen===0?'没网':pct(keep.dOpen)}</b>，关着时是 <b>${pct(keep.d)}</b>。看守者能决定什么时候开、一次开多久、让不让跳蚤看见。跳蚤知道看守者的规律，用“逃出概率最高”的策略应对。下面按跳蚤能做到的最好成绩从低到高排，第一名就是看守者的最优安排。比例、密度和跳蚤的条件都沿用上面的设置。`;
+  el.innerHTML='<p class="note">计算中…</p>';
+  const C=[
+    {n:'永远关着',sub:'不满足开网要求，仅作参照',o:{sched:'const'},ref:true},
+    {n:'定时开 1 天，第一次尽量晚',o:{sched:'periodic',L:1,off:Tof(1)-1}},
+    {n:'定时开 1 天，第一天就开',o:{sched:'periodic',L:1,off:0}},
+    {n:'定时开 3 天，第一次尽量晚',o:{sched:'periodic',L:3,off:Tof(3)-3}},
+    {n:'定时开 6 天，第一次尽量晚',o:{sched:'periodic',L:6,off:Tof(6)-6}},
+    {n:'随机开，跳蚤看得见',o:{sched:'random',vis:'yes'},pair:'r'},
+    {n:'随机开，跳蚤看不见',o:{sched:'random',vis:'no'},pair:'r',blind:1},
+    {n:'成团开（平均 3 天），看得见',o:{sched:'burst',L:3,vis:'yes'},pair:'b3'},
+    {n:'成团开（平均 3 天），看不见',o:{sched:'burst',L:3,vis:'no'},pair:'b3',blind:1},
+    {n:'成团开（平均 6 天），看得见',o:{sched:'burst',L:6,vis:'yes'},pair:'b6'},
+    {n:'成团开（平均 6 天），看不见',o:{sched:'burst',L:6,vis:'no'},pair:'b6',blind:1},
+  ];
+  const res=[];
+  for(const c of C){
+    await tick();if(my!==jailJob)return;
+    P={...keep,...c.o,obj:'escape'};
+    const net=buildNet(),sol=solve(P.F0,null,net),k=i0(sol),mc=monteCarlo(500,{sol,net});
+    res.push({...c,x:sol.X[k],v:sol.V[k],mc,first:net.off});
+    P=keep;
+  }
+  const ref=res.find(r=>r.ref),rest=res.filter(r=>!r.ref).sort((a,b)=>a.x-b.x),mx=Math.max(...res.map(r=>r.x),1e-9);
+  const lo=rest[0].x,nTie=rest.filter(r=>r.x-lo<5e-4).length,tied=Math.max(...res.map(r=>r.x))-Math.min(...res.map(r=>r.x))<2e-3;
+  const isBest=r=>!r.ref&&!tied&&r.x-lo<5e-4;
+  const row=(r,i)=>`<div class="jr ${isBest(r)?'best':''} ${r.ref?'ref':''}"><div class="jt"><span>${r.n}${isBest(r)?`<span class="chip">${nTie>1?'并列最优':'看守者最优'}</span>`:''}</span><b>${(r.x*100).toFixed(1)}%</b></div><div class="tr"><i style="width:${(r.x/mx*100).toFixed(1)}%"></i></div><div class="js">${r.ref?r.sub:`跳蚤应对：${r.mc.esc?`${pct(r.mc.escOpen)} 的逃出发生在网开时，平均第 ${r.mc.escDay.toFixed(0)} 天出去`:'几乎逃不出'}${r.first!==undefined?`；第一次开网在第 ${r.first} 天`:''}`}</div></div>`;
+  el.innerHTML=rest.map(row).join('')+row(ref,-1);
+  const best=rest[0],worst=rest[rest.length-1];
+  const pairs=['r','b3','b6'].map(p=>{const v=res.find(r=>r.pair===p&&!r.blind),b=res.find(r=>r.pair===p&&r.blind);return v.x-b.x;});
+  const blindGain=pairs.reduce((a,b)=>a+b,0)/pairs.length;
+  const early=res.find(r=>r.n.includes('第一天就开')),late=res.find(r=>r.n==='定时开 1 天，第一次尽量晚');
+  if(tied){P=keep;document.getElementById('jailNote').textContent=`所有安排的结果都一样（${(lo*100).toFixed(1)}%），因为关着的网已经拦不住跳蚤：网关着时全力跳的穿网率就有 ${pct(passD(keep.d,3))}，跳蚤第 1 天就会跳出去，根本用不上开网的机会，看守者怎么安排都没用。这个上限也不是 100%，因为每天先结算自然死亡，跳蚤有 ${((keep.h0+keep.rin)*100).toFixed(1)}%（基础死亡率 + 罐内风险）的概率在第 1 天跳之前就死了。把网密度调到 70% 以上，不同安排的差别才会出现。`;return;}
+  let t=`在同样的开网时间下，看守者最好的安排是「${best.n}」，跳蚤最多只有 ${(best.x*100).toFixed(1)}% 的机会逃出；最差的是「${worst.n}」，跳蚤能逃出 ${(worst.x*100).toFixed(1)}%。`;
+  t+=`让跳蚤看不见网开没开，平均能把逃出概率压低 ${(blindGain*100).toFixed(1)} 个百分点。`;
+  t+=`同样是定时开 1 天，第一次开网放在第 ${late.first} 天比第 0 天少让 ${((early.x-late.x)*100).toFixed(1)} 个百分点的跳蚤逃走。`;
+  t+=best.x-ref.x<5e-4?`最优安排的效果已经和永远关着（${(ref.x*100).toFixed(1)}%）一样：开网被推迟到跳蚤撑不到的时候，等于没开。`:`即使是最优安排，也比永远关着（${(ref.x*100).toFixed(1)}%）多给了跳蚤 ${((best.x-ref.x)*100).toFixed(1)} 个百分点。`;
+  document.getElementById('jailNote').textContent=t;
+}
+
+// ---------- learned helplessness: a flea that has to learn the net from its own failures ----------
+const KMAX=24,WMAX=30,DG=Array.from({length:20},(_,i)=>0.025+i*0.05);
+// prior over the unknown density: Beta-shaped weights on a grid, mean = lhMu
+function priorW(){const c=4,a=P.lhMu*c,b=(1-P.lhMu)*c;const w=DG.map(d=>Math.pow(d,a-1)*Math.pow(1-d,b-1));const s=w.reduce((x,y)=>x+y,0);return w.map(x=>x/s);}
+function outsideV(){const Vo=new Float64Array(HMAX+2);
+  for(let h=HMAX;h>=1;h--){const q=Math.min(1,hz(h)+P.rho),up=h===HMAX?0:P.r;Vo[h]=(1+(1-q)*up*(h===HMAX?0:Vo[h+1]))/(1-(1-q)*(1-up));}return Vo;}
+// state (f, e, h, k, w): k = summed strength of failed jumps (sufficient statistic: a failure at strength j
+// has likelihood d^(0.8j)), w = days since the last failure (only matters if the flea thinks the net may be removed)
+function solveLearn(q,W){
+  const pw=priorW(),KK=KMAX+1,WW=W+1,SH=KK*WW,SE=(HMAX+2)*SH,SF=(EMAX+1)*SE,N=(P.F0+1)*SF;
+  const Ep=[0,1,2,3].map(j=>Array.from({length:KK},(_,k)=>{let z=0,s=0;DG.forEach((d,i)=>{const l=pw[i]*Math.pow(d,0.8*k);z+=l;s+=l*(1-Math.pow(d,0.8*j));});return s/z;}));
+  const Prem=Array.from({length:WW},(_,w)=>1-Math.pow(1-q,w));
+  const pp=(k,w,j)=>{const r=Prem[Math.min(w,W)];return r+(1-r)*Ep[j][Math.min(k,KMAX)];};
+  const V=new Float32Array(N),X=new Float32Array(N),A=new Int8Array(N),Vo=outsideV();
+  const id=(e,f,h,k,w)=>f*SF+e*SE+h*SH+k*WW+w;
+  const gv=(arr,e,f,h,k,w)=>(e<=0||h<=0)?0:arr[id(e,f,h,k,w)];
+  const esc=P.obj==='escape',r=P.r;
+  for(let f=0;f<=P.F0;f++)for(let e=1;e<=EMAX;e++)for(let h=1;h<=HMAX;h++){
+    const s=1-Math.min(1,hz(h)+P.rin),h2r=Math.min(HMAX,h+1);
+    for(let k=0;k<KK;k++)for(let w=0;w<WW;w++){
+      const w1=Math.min(W,w+1);let bk=-1,bk2=-1,ba=-1,bv=1,bx=0;
+      for(let a=0;a<5;a++){
+        let v,x;
+        if(a===0){if(f<=0)continue;const e2=Math.min(EMAX,e-P.m+P.g);v=1+s*gv(V,e2,f-1,h,k,w1);x=s*gv(X,e2,f-1,h,k,w1);}
+        else if(a===1){const e2=e-P.m;v=1+s*(r*gv(V,e2,f,h2r,k,w1)+(1-r)*gv(V,e2,f,h,k,w1));x=s*(r*gv(X,e2,f,h2r,k,w1)+(1-r)*gv(X,e2,f,h,k,w1));}
+        else{const j=a-1,e2=e-P.m-P.jc*j;if(e2<0)continue;const p=pp(k,w,j),h2=h-dmgA(j),k2=Math.min(KMAX,k+j);
+          v=1+s*(p*Vo[h]+(1-p)*gv(V,e2,f,h2,k2,0));x=s*(p+(1-p)*gv(X,e2,f,h2,k2,0));}
+        const k1=esc?x:v,k2=esc?v:x,eps=esc?1e-6:1e-4;
+        if(k1>bk+eps||(Math.abs(k1-bk)<=eps&&k2>bk2)){bk=k1;bk2=k2;ba=a;bv=v;bx=x;}
+      }
+      if(ba<0){ba=1;bv=1;bx=0;}
+      const i=id(e,f,h,k,w);V[i]=bv;X[i]=bx;A[i]=ba;
+    }
+  }
+  return {V,X,A,id,W,pp,q};
+}
+// a net that disappears on day T and never comes back (for the all-knowing reference flea)
+function goneNet(T){return {n:T+1,blind:false,init:0,pp:(i,j)=>i>=T?1:passD(P.d,j),tr:i=>[[1,Math.min(i+1,T)]],open:i=>i>=T?1:0,label:()=>'',short:()=>''};}
+function newLearnFlea(){return {e:P.e0,f:P.F0,h:HMAX,day:0,alive:true,out:false,hits:0,escDay:0,k:0,w:0,sinceJump:0,lastJump:0,atRem:false,remSeen:false};}
+function stepLearn(s,pol,T){
+  if(!s.alive)return null;
+  if(s.out){const q=Math.min(1,hz(s.h)+P.rho);s.day++;
+    if(Math.random()<q){s.alive=false;return {t:'dieOut'};}
+    if(s.h<HMAX&&Math.random()<P.r){s.h++;return {t:'outHeal'};}
+    return {t:'outLive'};}
+  s.day++;
+  const gone=s.day-1>=T;
+  if(gone&&!s.remSeen){s.remSeen=true;s.atRem=true;}
+  if(Math.random()<hz(s.h)+P.rin){s.alive=false;return {t:'die',open:gone};}
+  const a=pol(s);
+  if(a<2){s.w++;s.sinceJump++;}
+  if(a===0){s.e=Math.min(EMAX,s.e-P.m+P.g);s.f--;return {t:'eat',open:gone};}
+  if(a===1){s.e-=P.m;let healed=false;if(s.h<HMAX&&Math.random()<P.r){s.h++;healed=true;}
+    if(s.e<=0){s.alive=false;return {t:'starve',open:gone};}return {t:'rest',healed,open:gone};}
+  const j=a-1;s.e=s.e-P.m-P.jc*j;s.sinceJump=0;s.lastJump=s.day;
+  if(gone||Math.random()<passD(P.d,j)){s.out=true;s.escDay=s.day;return {t:'escape',j,open:gone};}
+  s.h-=dmgA(j);s.hits++;s.k=Math.min(KMAX,s.k+j);s.w=0;
+  if(s.h<=0){s.alive=false;return {t:'hitDie',j,open:gone};}
+  if(s.e<=0){s.alive=false;return {t:'hitStarve',j,open:gone};}
+  return {t:'hit',j,open:gone};
+}
+function learnMC(pol,n){
+  const T=P.lhT;let esc=0,atRem=0,trapped=0,hits=0,last=0,lastN=0;
+  for(let i=0;i<n;i++){const s=newLearnFlea();let g=0;while(s.alive&&g++<5000)stepLearn(s,pol,T);
+    if(s.out)esc++;if(s.atRem){atRem++;if(!s.out)trapped++;}hits+=s.hits;if(s.lastJump){last+=s.lastJump;lastN++;}}
+  return {esc:esc/n,atRem:atRem/n,trap:atRem?trapped/atRem:NaN,hits:hits/n,last:lastN?last/lastN:0};
+}
+let LS=null,LDEMO=null,learnJob=0;
+const LTYPES=[
+  {key:'A',n:'A · 学习型，认为网永远不会变'},
+  {key:'B',n:'B · 学习型，认为网可能被拿走'},
+  {key:'C',n:'C · 偶尔试探：A 的做法，再加上每 7 天轻跳一次'},
+  {key:'D',n:'D · 撞 2 次就放弃'},
+  {key:'E',n:'E · 全知：知道网的真实密度和哪天被拿走',ref:true},
+];
+async function runLearn(){
+  const my=++learnJob;await tick();if(my!==learnJob)return;
+  document.getElementById('lhRows').innerHTML='<p class="note">计算中…</p>';
+  await tick();if(my!==learnJob)return;
+  const LA=solveLearn(0,0);
+  await tick();if(my!==learnJob)return;
+  const LB=P.lhQ>0?solveLearn(P.lhQ,WMAX):LA;
+  await tick();if(my!==learnJob)return;
+  const T=P.lhT,netO=goneNet(T),O=solve(P.F0,null,netO);
+  const polA=s=>LA.A[LA.id(s.e,s.f,s.h,s.k,0)];
+  const pols={
+    A:polA,
+    B:s=>LB.A[LB.id(s.e,s.f,s.h,s.k,Math.min(LB.W,s.w))],
+    C:s=>{const a=polA(s);return a<2&&s.sinceJump>=7&&s.e-P.m-P.jc>=1?2:a;},
+    D:s=>s.hits<2&&s.e-P.m-3*P.jc>=3?4:(s.f>0&&s.e<=EMAX-P.g+P.m?0:1),
+    E:s=>O.A[O.id(s.e,s.f,s.h,Math.min(s.day-1,T))],
+  };
+  const res={};
+  for(const t of LTYPES){await tick();if(my!==learnJob)return;res[t.key]=learnMC(pols[t.key],2000);}
+  LS={LA,LB,pols};
+  renderLearn(res,LA,LB);
+  if(LDEMO)restartSim();
+}
+function renderLearn(res,LA,LB){
+  const T=P.lhT,f2=Math.floor(P.F0/2);
+  const fmtT=x=>isNaN(x)?'—':pct(x);
+  document.getElementById('lhRows').innerHTML=LTYPES.map(t=>{const r=res[t.key];
+    const name=t.key==='B'?`B · 学习型，认为网每天有 ${(P.lhQ*100).toFixed(1)}% 可能被拿走`:t.n;
+    return `<div class="jr ${t.ref?'ref':''}"><div class="jt"><span>${name}</span><b>${fmtT(r.trap)}</b></div><div class="tr"><i style="width:${isNaN(r.trap)?0:(r.trap*100).toFixed(1)}%;background:var(--danger)"></i></div><div class="js">网被拿走那天还在罐里的跳蚤中困死的比例 · 最终逃出 ${pct(r.esc)} · 平均撞网 ${r.hits.toFixed(1)} 次${r.last?` · 最后一次跳平均在第 ${r.last.toFixed(0)} 天`:''}</div></div>`;}).join('');
+  // chart 1: estimated pass rate vs accumulated failures, and whether A still jumps
+  const p1=[];let kStar=null;
+  for(let k=0;k<=KMAX;k++){const on=LA.A[LA.id(EMAX,f2,HMAX,k,0)]>=2;p1.push({x:k,y:LA.pp(k,0,3),on});if(!on&&kStar===null)kStar=k;}
+  bandChart('lhC1',p1,KMAX,'累计撞网力度（全力跳一次记 3）',kStar);
+  const kB=kStar===null?KMAX:kStar,p2=[];let wStar=null;
+  for(let w=0;w<=WMAX;w++){const on=LB.A[LB.id(EMAX,f2,HMAX,kB,Math.min(LB.W,w))]>=2;p2.push({x:w,y:LB.pp(kB,w,3),on});if(on&&wStar===null&&w>0)wStar=w;}
+  bandChart('lhC2',p2,WMAX,'上次撞网后过了多少天',wStar);
+  document.getElementById('lhC2t').textContent=`B 撞网累计力度到 ${kB} 之后：隔得越久，越相信网可能已经没了`;
+  const A=res.A,B=res.B,C=res.C,D=res.D,E=res.E;
+  let t='';
+  if(kStar===0)t+=`在这组条件下，学习型跳蚤一开始就觉得不值得跳（先验以为网有 ${pct(P.lhMu)} 密，撞网又疼），所以根本没有“撞出来的无助”。`;
+  else if(kStar===null)t+='在这组条件下，学习型跳蚤撞再多次也不会彻底放弃，所以不会出现习得性无助。可以把网调密、把撞网伤害调高试试。';
+  else t+=`学习型跳蚤 A 撞网累计力度到 ${kStar}（大约 ${Math.ceil(kStar/3)} 次全力跳）后，估计的全力跳穿网率降到 ${pct(LA.pp(kStar,0,3))}，在罐里还剩一半食物时就不再跳了：再撞一次的伤会让以后每天都更容易死，它宁愿先把存粮吃完再说，可很多跳蚤等不到那天就老死在罐里。`;
+  if(!isNaN(A.trap))t+=` 网在第 ${T} 天被拿走时还在罐里的跳蚤中，A 有 ${pct(A.trap)} 再也没出去，`+
+    `会偶尔试探的 C 只有 ${fmtT(C.trap)}，撞 2 次就放弃的 D 有 ${fmtT(D.trap)}，认为网可能被拿走的 B 有 ${fmtT(B.trap)}，全知的 E 是 ${fmtT(E.trap)}。`;
+  else t+=` 在第 ${T} 天之前，跳蚤都已经出去或死了，网被拿走这件事没有影响。把“网被拿走的日子”调早一些试试。`;
+  if(P.lhQ>0&&wStar!==null&&kStar)t+=` B 放弃后过 ${wStar} 天，会觉得网可能已经没了，再试一次。`;
+  document.getElementById('lhNote').textContent=t;
+}
+function bandChart(id,pts,xMax,xLabel,markX){
+  const W=460,H=210,L=40,R=14,T=12,B=34,iw=W-L-R,ih=H-T-B,X=x=>L+x/xMax*iw,Y=y=>T+ih-y*ih,cw=iw/xMax;
+  let s=`<svg id="${id}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">`;
+  pts.forEach(p=>{if(!p.on)return;const x0=Math.max(L,X(p.x)-cw/2),x1=Math.min(L+iw,X(p.x)+cw/2);s+=`<rect x="${x0}" y="${T}" width="${x1-x0}" height="${ih}" fill="var(--a-j3)" opacity=".16"/>`;});
+  for(const v of [0,0.5,1])s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${v*100}%</text>`;
+  const st=xMax>20?5:2;for(let x=0;x<=xMax;x+=st)s+=`<text x="${X(x)}" y="${H-18}" text-anchor="middle">${x}</text>`;
+  s+=`<text x="${L+iw/2}" y="${H-3}" text-anchor="middle">${xLabel}</text>`;
+  if(markX!==null&&markX!==undefined)s+=`<line x1="${X(markX)}" x2="${X(markX)}" y1="${T}" y2="${T+ih}" stroke="var(--danger)" stroke-dasharray="3 3"/>`;
+  s+=`<path d="${pts.map((p,i)=>(i?'L':'M')+X(p.x).toFixed(1)+' '+Y(p.y).toFixed(1)).join('')}" fill="none" stroke="var(--amber)" stroke-width="2.5"/></svg>`;
+  document.getElementById(id).outerHTML=s;
+}
+const lhCtl=document.getElementById('lhCtl'),LHC=[];
+[{id:'lhT',n:'网被拿走的日子',min:0,max:60,step:1,fmt:v=>'第 '+v+' 天'},
+ {id:'lhMu',n:'起初以为网多密',min:0.1,max:0.9,step:0.1,fmt:pct},
+ {id:'lhQ',n:'B 以为网每天被拿走的概率',min:0,max:0.05,step:0.005,fmt:v=>(v*100).toFixed(1)+'%'}].forEach(c=>{
+  lhCtl.insertAdjacentHTML('beforeend',`<label for="c_${c.id}">${c.n}</label><input type="range" id="c_${c.id}" min="${c.min}" max="${c.max}" step="${c.step}"><output id="o_${c.id}"></output>`);
+  const inp=document.getElementById('c_'+c.id);
+  inp.addEventListener('input',()=>{P[c.id]=+inp.value;syncLh();clearTimeout(lhT0);lhT0=setTimeout(runLearn,120);});
+  c.inp=inp;c.o=document.getElementById('o_'+c.id);LHC.push(c);
+});
+var lhT0=0;
+function syncLh(){LHC.forEach(c=>{c.inp.value=P[c.id];c.o.textContent=c.fmt(P[c.id]);});}
+document.getElementById('lhClassic').onclick=()=>{P={...P,d:0.9,dmg:2,F0:20,sched:'const',obj:'life',lhT:8,lhMu:0.5,lhQ:0.05};markPreset(-1);sync();syncLh();schedule(true);};
+document.getElementById('lhDemo').onclick=()=>{LDEMO=document.getElementById('lhWho').value;restartSim();document.querySelector('.jarbox').scrollIntoView({behavior:'smooth'});};
+document.getElementById('lhStop').onclick=()=>{LDEMO=null;restartSim();};
+
+// ---------- tipping-point scanner ----------
+let scanJob=0,scanParam='d';
+const scanSel=document.getElementById('scanP');
+function scanOptions(){
+  const opts=CTL.filter(c=>!c.grp&&c.type!=='sel'&&(!c.show||c.show(P.sched)));
+  if(!opts.some(c=>c.id===scanParam))scanParam='d';
+  scanSel.innerHTML=opts.map(c=>`<option value="${c.id}"${c.id===scanParam?' selected':''}>${c.n}</option>`).join('');
+}
+scanSel.addEventListener('change',()=>{scanParam=scanSel.value;runScan();});
+function firstJump(so,net){
+  let e=P.e0,f=P.F0,h=HMAX,n=net.init,day=0;
+  while(day<200&&e>0&&h>0){
+    const a=so.A[so.id(e,f,h,n)];if(a>=2)return {day,a};
+    if(a===0){e=Math.min(EMAX,e-P.m+P.g);f--;}else e-=P.m;
+    n=likelyNext(net.tr(n,0));day++;
+  }
+  return null;
+}
+async function runScan(){
+  const my=++scanJob,keep={...P},c=CTL.find(x=>x.id===scanParam);
+  const el=document.getElementById('scanList');el.innerHTML='<p class="note">扫描中…</p>';
+  const xs=[];
+  if(c.step>=1)for(let x=c.min;x<=c.max+1e-9;x+=c.step)xs.push(x);
+  else{const n=Math.max(40,Math.round((c.max-c.min)/c.step));for(let i=0;i<=n;i++)xs.push(+(c.min+(c.max-c.min)*i/n).toFixed(5));}
+  const pts=[];
+  for(let i=0;i<xs.length;i++){
+    if(i%4===0){await tick();if(my!==scanJob){return;}}
+    P={...keep,[c.id]:xs[i]};
+    const net=buildNet(),so=solve(P.F0,null,net),k=so.id(P.e0,P.F0,HMAX,net.init);
+    pts.push({x:xs[i],V:so.V[k],X:so.X[k],fj:firstJump(so,net)});
+    P=keep;
+  }
+  // a step is a tipping point when escape odds or the first-jump day change abruptly, or lifespan jumps
+  const steps=pts.slice(1).map((p,i)=>Math.abs(p.V-pts[i].V)),med=steps.slice().sort((a,b)=>a-b)[steps.length>>1]||0;
+  const jumps=[];
+  for(let i=1;i<pts.length;i++){
+    const A=pts[i-1],B=pts[i],dV=B.V-A.V,rel=Math.abs(dV)/Math.max(A.V,B.V);
+    const dX=Math.abs(B.X-A.X),dd=Math.abs((A.fj?A.fj.day:200)-(B.fj?B.fj.day:200));
+    const lifeJump=rel>0.08&&Math.abs(dV)>3*med+0.5,behav=dX>0.12||dd>=15||(!A.fj)!==(!B.fj);
+    if(lifeJump||behav)jumps.push({i,A,B,kind:lifeJump?'life':'behav'});
+  }
+  drawScan(pts,jumps,c,keep[c.id]);
+  const fj=p=>p.fj?`第 ${p.fj.day} 天${ACT[p.fj.a].n}`:'不跳';
+  el.innerHTML=jumps.length?jumps.map(j=>`<div class="sj"><span class="chip" style="background:var(${j.kind==='life'?'--danger':'--mesh'})">${j.kind==='life'?'寿命突变':'行为翻转'}</span>`+
+    `<b>${c.n} ${c.fmt(j.A.x)} → ${c.fmt(j.B.x)}</b><span>寿命 ${j.A.V.toFixed(1)} → ${j.B.V.toFixed(1)} 天 · 逃出 ${pct(j.A.X)} → ${pct(j.B.X)} · 首跳 ${fj(j.A)} → ${fj(j.B)}</span>`+
+    `<button data-v="${j.B.x}">设成 ${c.fmt(j.B.x)}</button></div>`).join(''):
+    '<p class="note">在这个参数的整个范围里没有找到突变：寿命、逃出率和首跳日都是平滑变化的。换一个参数或换一组实验条件试试。</p>';
+  el.querySelectorAll('button[data-v]').forEach(b=>b.onclick=()=>{P[c.id]=+b.dataset.v;markPreset(-1);sync();schedule(true);});
+  const nL=jumps.filter(j=>j.kind==='life').length,nB=jumps.length-nL;
+  document.getElementById('scanNote').textContent=jumps.length?
+    `找到 ${jumps.length} 处突变。`+(nL?`${nL} 处寿命突变：通常是“够不够得着”的门槛，能量、血量、天数都是整数，差一点就整个够不着。`:'')+
+    (nB?`${nB} 处行为翻转：两种做法在这里打平，最优选择整个换边，寿命却只是平滑变化。`:''):'';
+}
+function drawScan(pts,jumps,c,cur){
+  const W=640,L=44,R=44,T=12,H1=150,G=26,H2=70,B=30,H=T+H1+G+H2+B,iw=W-L-R;
+  const x0=pts[0].x,x1=pts[pts.length-1].x,X=x=>L+(x-x0)/(x1-x0||1)*iw;
+  const vmax=Math.max(...pts.map(p=>p.V))*1.08,nice=vmax>200?100:vmax>100?50:vmax>40?20:10,top=Math.ceil(vmax/nice)*nice;
+  const Y=v=>T+H1-v/top*H1,Y2=p=>T+H1-p*H1;
+  const dmax=Math.max(10,...pts.map(p=>p.fj?p.fj.day:0)),D0=T+H1+G,YD=d=>D0+H2-(d/dmax)*H2;
+  let s=`<svg id="scanSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">`;
+  jumps.forEach(j=>{const a=X(j.A.x),b=X(j.B.x);s+=`<rect x="${a}" y="${T}" width="${Math.max(2,b-a)}" height="${H1+G+H2}" fill="var(${j.kind==='life'?'--danger':'--mesh'})" opacity=".18"/>`;});
+  for(let v=0;v<=top;v+=nice)s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${v}</text>`;
+  for(const p of [0,0.5,1])s+=`<text x="${W-R+6}" y="${Y2(p)+3}">${p*100}%</text>`;
+  s+=`<text x="${L}" y="${T-2}">天</text><text x="${L}" y="${D0-6}">首跳在第几天（假设每跳都失败的路线）</text>`;
+  s+=`<line x1="${L}" x2="${W-R}" y1="${D0+H2}" y2="${D0+H2}" stroke="var(--line)"/><line x1="${L}" x2="${W-R}" y1="${D0}" y2="${D0}" stroke="var(--line)" stroke-dasharray="2 3"/>`;
+  s+=`<text x="${L-6}" y="${D0+H2+3}" text-anchor="end">0</text><text x="${L-6}" y="${D0+3}" text-anchor="end">${dmax}</text>`;
+  const tk=[x0,x0+(x1-x0)/4,x0+(x1-x0)/2,x0+3*(x1-x0)/4,x1];
+  tk.forEach(x=>s+=`<text x="${X(x)}" y="${H-14}" text-anchor="middle">${c.fmt(c.step>=1?Math.round(x):+x.toFixed(4))}</text>`);
+  s+=`<text x="${L+iw/2}" y="${H-1}" text-anchor="middle">${c.n}</text>`;
+  const path=(f,y)=>pts.map((p,i)=>(i?'L':'M')+X(p.x).toFixed(1)+' '+y(f(p)).toFixed(1)).join('');
+  s+=`<path d="${path(p=>p.X,Y2)}" fill="none" stroke="var(--danger)" stroke-width="1.6" stroke-dasharray="4 3"/>`;
+  s+=`<path d="${path(p=>p.V,Y)}" fill="none" stroke="var(--amber)" stroke-width="2.6"/>`;
+  pts.forEach(p=>{s+=p.fj?`<circle cx="${X(p.x)}" cy="${YD(p.fj.day)}" r="2.6" fill="var(${ACT[p.fj.a].c})"/>`:`<text x="${X(p.x)}" y="${D0+H2/2+3}" text-anchor="middle" style="font-size:9px">×</text>`;});
+  if(cur!==undefined)s+=`<line x1="${X(cur)}" x2="${X(cur)}" y1="${T}" y2="${D0+H2}" stroke="var(--amber)" stroke-dasharray="2 3"/>`;
+  s+='</svg>';
+  document.getElementById('scanSvg').outerHTML=s;
+}
+
+// ---------- animation ----------
+const cv=document.getElementById('jar'),ctx=cv.getContext('2d');
+const DPR=Math.min(2,window.devicePixelRatio||1);cv.width=560*DPR;cv.height=400*DPR;ctx.scale(DPR,DPR);
+const JX0=70,JX1=290,JTOP=92,JBOT=360,GROUND=360,OUTX0=330,OUTX1=545;
+let sim=null,playing=true,speed=1,lastT=0,crumbs=[];
+const logEl=document.getElementById('log');
+function log(msg,cls){const d=document.createElement('div');d.textContent=msg;if(cls)d.className=cls;logEl.prepend(d);while(logEl.children.length>60)logEl.lastChild.remove();}
+function restartSim(){
+  const learn=!!(LDEMO&&LS);
+  sim={s:learn?newLearnFlea():newFlea(NET),ev:null,t:0,x:JX0+60,y:JBOT-6,dur:1,flip:false,flash:0,outX:430,lastOpen:false,learn,pol:learn?LS.pols[LDEMO]:null,lsol:learn?(LDEMO==='B'?LS.LB:LS.LA):null};
+  sim.lastOpen=simOpenNext(sim.s);
+  crumbs=[];for(let i=0;i<P.F0;i++)crumbs.push({x:JX1-26-((i*37)%60)+Math.random()*6,y:JBOT-4-Math.floor(i/6)*5-Math.random()*2});
+  logEl.innerHTML='';log(`第 0 天：一只跳蚤醒来，能量 ${P.e0}，罐里有 ${P.F0} 份食物。`);
+  if(sim.learn)log(`演示 ${LDEMO} 型跳蚤：它不知道网有多密，网会在第 ${P.lhT} 天被悄悄拿走。`,'good');
+  hud();
+}
+function simOpenNext(s){return sim&&sim.learn?s.day>=P.lhT:trueOpen(s,NET);}
+function netText(s){
+  if(s.out)return '—';if(sim.learn)return s.day>=P.lhT?'没了（它不知道）':'还在';if(P.sched==='const')return '固定';
+  const o=trueOpen(s,NET);return (o?'开着':'关着')+(NET.blind?'（它看不见）':'');
+}
+function hud(){
+  const s=sim.s;
+  document.getElementById('hDay').textContent=s.day;
+  document.getElementById('hE').textContent=s.out?'∞':s.e;
+  document.getElementById('hH').textContent=s.h;
+  document.getElementById('hF').textContent=s.f;
+  document.getElementById('hN').textContent=netText(s);
+  document.getElementById('bE').style.width=(s.out?100:s.e/EMAX*100)+'%';
+  document.getElementById('bH').style.width=(Math.max(0,s.h)/HMAX*100)+'%';
+  document.getElementById('bF').style.width=(P.F0?s.f/P.F0*100:0)+'%';
+  markCur();
+}
+const NAMES={1:'轻跳',2:'中跳',3:'全力跳'};
+function nextEvent(){
+  const s=sim.s;if(!s.alive){sim.ev=null;return;}
+  const ev=sim.learn?stepLearn(s,sim.pol,P.lhT):stepFlea(s);sim.ev=ev;sim.t=0;sim.x0=sim.x;sim.y0=sim.y;
+  sim.dur=s.out&&ev.t!=='escape'?260:700;
+  const d=`第 ${s.day} 天：`,tag=ev.open&&(sim.learn||P.sched!=='const')?(sim.learn?'（网其实已经没了）':'（网开着）'):'';
+  switch(ev.t){
+    case 'eat':log(d+`吃了一份食物，能量 → ${s.e}`);crumbs.pop();break;
+    case 'rest':log(d+'休息'+tag+(ev.healed?`，伤势好转，健康 → ${s.h}`:''),ev.healed?'good':'');break;
+    case 'hit':log(d+`${NAMES[ev.j]}${tag}，撞网！健康 → ${s.h}`,'bad');break;
+    case 'escape':log(d+`${NAMES[ev.j]}${tag}，钻出去了！`,'good');sim.dur=1100;break;
+    case 'hitDie':log(d+`${NAMES[ev.j]}撞网，伤重死亡。`,'bad');break;
+    case 'hitStarve':log(d+`${NAMES[ev.j]}撞网，力气耗尽而死。`,'bad');break;
+    case 'starve':log(d+'能量耗尽，饿死在罐里。','bad');break;
+    case 'die':log(d+'在罐里自然死亡。','bad');break;
+    case 'outHeal':log(d+`在外面养伤，健康 → ${s.h}`,'good');break;
+    case 'outLive':if(s.day%10===0)log(d+'在外面吃饱喝足。');break;
+    case 'dieOut':log(d+'在罐外寿终。');break;
+  }
+  if(s.alive&&!s.out){const o=simOpenNext(s);if(o!==sim.lastOpen&&(sim.learn||P.sched!=='const'))log(sim.learn?`第 ${s.day+1} 天：网被悄悄拿走了，跳蚤不知道。`:`第 ${s.day+1} 天：网${o?'打开了':'又关上了'}${NET.blind?'，但跳蚤看不见':''}`,o?'good':'');sim.lastOpen=o;}
+  if(!s.alive)log(`—— 一共活了 ${s.day} 天${s.out?`（第 ${s.escDay} 天越狱）`:''}。点“换一只跳蚤”再看一次。`,s.out?'good':'bad');
+  hud();
+}
+const lerp=(a,b,t)=>a+(b-a)*t;
+function animate(ts){
+  const dt=Math.min(100,ts-(lastT||ts));lastT=ts;
+  if(sim&&playing){
+    if(!sim.ev){if(sim.s.alive)nextEvent();}
+    else{sim.t+=dt*speed/sim.dur;if(sim.t>=1){finishEv();if(sim.s.alive)nextEvent();else sim.ev=null;}}
+  }
+  draw();requestAnimationFrame(animate);
+}
+function finishEv(){
+  const ev=sim.ev;if(!ev)return;
+  if(ev.t==='escape'){sim.x=sim.outX;sim.y=GROUND-6;}
+  else if(sim.s.out){sim.x=sim.tx??sim.x;sim.y=GROUND-6;}
+  else{sim.y=JBOT-6;if(ev.t==='eat')sim.x=sim.x0;}
+  if(!sim.s.alive)sim.flip=true;
+}
+function fleaPos(){
+  const ev=sim.ev,t=Math.min(1,sim.t);
+  if(!ev)return [sim.x,sim.y];
+  const meshY=JTOP+4;
+  switch(ev.t){
+    case 'eat':{const fx=JX1-40,k=t<.5?t*2:2-t*2;return [lerp(sim.x0,fx,k),JBOT-6-Math.sin(k*Math.PI)*14];}
+    case 'rest':case 'starve':case 'die':return [sim.x,sim.y];
+    case 'hit':case 'hitDie':case 'hitStarve':{const k=t<.45?t/.45:1-(t-.45)/.55;const y=lerp(JBOT-6,meshY,1-Math.pow(1-k,2));
+      if(t>=.43&&t<.5)sim.flash=1;return [sim.x+Math.sin(t*9)*6,y];}
+    case 'escape':{if(t<.4){const k=t/.4;return [sim.x,lerp(JBOT-6,JTOP-26,1-Math.pow(1-k,2))];}
+      const k=(t-.4)/.6;return [lerp(sim.x,sim.outX,k),lerp(JTOP-26,GROUND-6,k)-Math.sin(k*Math.PI)*60];}
+    default:{
+      if(!ev.target){ev.from=sim.x;ev.target=Math.max(OUTX0+20,Math.min(OUTX1-10,sim.x+(Math.random()-.5)*60));sim.tx=ev.target;}
+      return [lerp(ev.from,ev.target,t),GROUND-6-Math.sin(t*Math.PI)*22];}
+  }
+}
+function draw(){
+  const W=560,H=400;
+  const C={bg:css('--surface'),ink:css('--ink'),muted:css('--muted'),line:css('--line'),mesh:css('--mesh'),food:css('--food'),amber:css('--amber'),danger:css('--danger'),glass:css('--glass')};
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=C.bg;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=C.line;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(10,GROUND+1);ctx.lineTo(W-10,GROUND+1);ctx.stroke();
+  ctx.fillStyle=C.food;ctx.globalAlpha=.55;
+  for(let i=0;i<70;i++){const x=OUTX0+((i*53)%(OUTX1-OUTX0)),y=GROUND-2-((i*17)%9);ctx.beginPath();ctx.arc(x,y,2.2,0,7);ctx.fill();}
+  ctx.globalAlpha=1;ctx.fillStyle=C.muted;ctx.font='12px '+css('--body');ctx.textAlign='center';
+  ctx.fillText('罐外 · 食物无限',(OUTX0+OUTX1)/2,GROUND+22);
+  ctx.fillText('罐内 · 食物有限',(JX0+JX1)/2,GROUND+22);
+  ctx.fillStyle=C.glass;ctx.globalAlpha=.55;roundRect(JX0,JTOP,JX1-JX0,JBOT-JTOP+2,[4,4,18,18]);ctx.fill();ctx.globalAlpha=1;
+  ctx.strokeStyle=C.mesh;ctx.lineWidth=2;roundRect(JX0,JTOP,JX1-JX0,JBOT-JTOP+2,[4,4,18,18]);ctx.stroke();
+  ctx.fillStyle=C.mesh;ctx.fillRect(JX0-8,JTOP-6,JX1-JX0+16,7);
+  // which net is up right now (the state the current action faces)
+  let open=false;
+  const lm=!!(sim&&sim.learn);
+  if(sim&&NET&&!sim.s.out){open=sim.ev&&sim.ev.open!==undefined?sim.ev.open:lm?sim.s.day>=P.lhT:trueOpen(sim.s,NET);}
+  if(P.sched==='const'&&!lm)open=false;
+  const dens=open?(lm?0:P.dOpen):P.d;
+  if(dens>0){
+    const gap=lerp(46,5,dens/0.95);
+    ctx.save();ctx.beginPath();ctx.rect(JX0-8,JTOP-22,JX1-JX0+16,16);ctx.clip();
+    ctx.strokeStyle=sim&&sim.flash>0?C.danger:open?C.food:C.mesh;ctx.lineWidth=sim&&sim.flash>0?1.6:1;
+    for(let x=JX0-30;x<JX1+30;x+=gap){ctx.beginPath();ctx.moveTo(x,JTOP-22);ctx.lineTo(x+16,JTOP-6);ctx.stroke();ctx.beginPath();ctx.moveTo(x+16,JTOP-22);ctx.lineTo(x,JTOP-6);ctx.stroke();}
+    ctx.restore();
+  }
+  ctx.strokeStyle=open?C.food:C.mesh;ctx.lineWidth=1;ctx.setLineDash(open&&dens===0?[4,3]:[]);ctx.strokeRect(JX0-8,JTOP-22,JX1-JX0+16,16);ctx.setLineDash([]);
+  if(sim&&sim.flash>0)sim.flash=Math.max(0,sim.flash-0.04*speed);
+  ctx.fillStyle=open?C.food:C.muted;ctx.textAlign='left';ctx.font='11px '+css('--mono');
+  const pr=j=>(passD(dens,j)*100|0)+'%';
+  const head=lm?(open?'网被拿走了':`网密度 ${pct(P.d)}（跳蚤不知道）`):P.sched==='const'?`网密度 ${pct(P.d)}`:open?(dens===0?'网被拿走了':`网开着 ${pct(dens)}`):`网关着 ${pct(dens)}`;
+  ctx.fillText(`${head} · 穿网率 轻${pr(1)} 中${pr(2)} 全力${pr(3)}`,JX0-8,JTOP-32);
+  if(lm&&!sim.s.out){ctx.fillStyle=C.muted;ctx.fillText(`它估计全力跳穿网率 ${pct(sim.lsol.pp(sim.s.k,sim.s.w,3))}，已撞网 ${sim.s.hits} 次`,JX0-8,JTOP-46);}
+  else if(NET&&NET.blind&&sim&&!sim.s.out){ctx.fillStyle=C.muted;ctx.fillText(`跳蚤看不见网；它估计网开着的概率 ${pct(sim.s.b)}`,JX0-8,JTOP-46);}
+  ctx.fillStyle=C.food;crumbs.forEach(c=>{ctx.beginPath();ctx.arc(c.x,c.y,2.6,0,7);ctx.fill();});
+  if(!sim)return;
+  const [x,y]=fleaPos(),ev=sim.ev;
+  drawFlea(x,y,sim.flip,C);
+  if(ev&&ev.t==='rest'){ctx.fillStyle=C.muted;ctx.font='12px '+css('--mono');ctx.globalAlpha=1-sim.t;ctx.fillText('z',x+8,y-10-sim.t*14);ctx.globalAlpha=1;}
+  if(ev&&(ev.t==='hit'||ev.t==='hitDie')&&sim.t>.45&&sim.t<.8){ctx.fillStyle=C.danger;ctx.font='bold 13px '+css('--mono');ctx.fillText('−'+dmgA(ev.j),x+10,JTOP+16);}
+}
+function drawFlea(x,y,dead,C){
+  ctx.save();ctx.translate(x,y);if(dead)ctx.scale(1,-1);
+  ctx.strokeStyle=dead?C.muted:C.ink;ctx.lineWidth=1;
+  for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(i*3,2);ctx.lineTo(i*4-2,7);ctx.stroke();}
+  ctx.beginPath();ctx.moveTo(4,2);ctx.lineTo(9,-2);ctx.lineTo(11,6);ctx.stroke();
+  ctx.fillStyle=dead?C.muted:C.amber;ctx.beginPath();ctx.ellipse(0,0,6.5,4.5,-0.25,0,7);ctx.fill();
+  ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(-5.5,-1.5,1.6,0,7);ctx.fill();
+  ctx.restore();
+}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h);}
+document.getElementById('btnPlay').onclick=e=>{playing=!playing;e.target.textContent=playing?'暂停':'继续';};
+document.getElementById('btnRestart').onclick=()=>restartSim();
+document.getElementById('speed').onchange=e=>speed=+e.target.value;
+
+sync();recompute(true);requestAnimationFrame(animate);
+})();
+</script>
+
+</html>
