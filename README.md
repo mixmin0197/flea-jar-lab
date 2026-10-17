@@ -1,12 +1,15 @@
 # 跳蚤越狱实验室
 
+**中文** · [English](README.en.md)
+
 一只跳蚤被关在罐子里，罐口有网。罐里的食物有限，罐外的食物吃不完。每一跳都要花力气，每撞一次网都会受伤、缩短寿命。它该怎么做，才能活得最久？
 
 这个项目把这个问题写成一个**马尔可夫决策过程**，用动态规划精确求出每种处境下的最优选择，并在网页里现场演示。项目从流传很广的“跳蚤跳罐子”寓言出发，延伸到心理学里的**习得性无助**，再加入会变化的网、看守者和跳蚤之间的博弈，以及决策中的**临界点**。
 
 - **在线体验**：<https://mixmin0197.github.io/flea-jar-lab/>
-- **交互网页**：[`index.html`](index.html)，单文件，下载后用浏览器直接打开也可以
-- **讲解视频**：[`video/flea-video.mp4`](video/flea-video.mp4)，3 分 17 秒，1080p，无配音，配程序生成的背景音乐
+- **交互网页**：[`index.html`](index.html)，单文件，下载后用浏览器直接打开也可以。右上角可以切换中文 / English。
+- **讲解视频（中文）**：[`video/flea-video.mp4`](video/flea-video.mp4)，3 分 17 秒，1080p，无配音，配程序生成的背景音乐
+- **讲解视频（英文）**：[`video/flea-video-en.mp4`](video/flea-video-en.mp4)
 
 ## 网页里有什么
 
@@ -49,8 +52,8 @@
 1. `node video-src/export-data.js video-src`：用模型重新计算视频里用到的数据，写入 `data.json`。
 2. `python3 video-src/server.py <ffmpeg 路径> <输出.mp4>`：启动本地服务（端口 8732），接收画面和音频。
 3. 在浏览器打开 `http://127.0.0.1:8732/render.html`，在控制台依次运行：
-   - `renderAll()`：先合成音乐，再在主线程渲染画面
-   - `renderFast()`：用 Web Worker 渲染画面（需要先运行过一次 `renderAll()` 生成音乐）
+   - `renderAll()`：先合成音乐，再在主线程渲染中文画面
+   - `renderFast('zh')` 或 `renderFast('en')`：用 Web Worker 渲染对应语言的画面（需要先运行过一次 `renderAll()` 生成音乐）
 
 ---
 

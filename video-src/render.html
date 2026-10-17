@@ -55,13 +55,14 @@ window.renderAll=async function(){
   STATUS.phase='muxing';const r=await fetch('/done',{method:'POST'});STATUS.result=await r.text();STATUS.phase='done';
 };
 window.drawAt=drawAt;
+{const l=new URLSearchParams(location.search).get('lang');if(l)setLang(l);}
 fetch('data.json').then(r=>r.json()).then(d=>{D=d;drawAt(+(new URLSearchParams(location.search).get('t')||3));window.READY=true;});
 
 // render frames in a worker (not throttled when the page is in the background)
-window.renderFast=async function(){
+window.renderFast=async function(lang='zh'){
   STATUS.phase='frames';await fetch('/start',{method:'POST'});
   const w=new Worker('worker.js');
-  await new Promise((res,rej)=>{w.onmessage=e=>{if(e.data.frame)STATUS.frame=e.data.frame;if(e.data.done)res();if(e.data.err)rej(e.data.err);};w.postMessage({D});});
+  await new Promise((res,rej)=>{w.onmessage=e=>{if(e.data.frame)STATUS.frame=e.data.frame;if(e.data.done)res();if(e.data.err)rej(e.data.err);};w.postMessage({D,lang});});
   STATUS.phase='muxing';const r=await fetch('/done',{method:'POST'});STATUS.result=await r.text();STATUS.phase='done';
 };
 </script>

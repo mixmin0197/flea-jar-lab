@@ -116,41 +116,46 @@ button.ref:hover{color:var(--amber)}
 .sj span:not(.chip){color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
 .sj .chip{font-size:11px;padding:0 6px;border-radius:3px;color:var(--surface)}
 .sj button{margin-left:auto;font-size:12px;padding:2px 8px}
+.langsw{display:flex;justify-content:flex-end;gap:6px;margin-bottom:6px}
+.langsw a{font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:2px 12px}
+.langsw a.on{color:var(--surface);background:var(--amber);border-color:var(--amber)}
+.langsw a:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:12px;padding:6px 8px;border-radius:5px;z-index:9;white-space:pre}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">动态规划 · 马尔可夫决策过程 · 博弈</div>
-    <h1>跳蚤越狱<em>实验室</em></h1>
-    <p class="lede">罐子里有一点食物，罐口有网。跳出去就是吃不完的世界，但每次撞网都会受伤、缩短寿命，每一跳还要花力气。网也可能变：某天突然被拿走，定时打开，或者随机打开。这一页用动态规划把每种处境下的最优选择精确算出来，再看看看守者该怎么安排开网，才能让跳蚤最难逃出去。</p>
+    <nav class="langsw" aria-label="Language"><a href="?lang=zh" data-l="zh" lang="zh-CN">中文</a><a href="?lang=en" data-l="en" lang="en">English</a></nav>
+    <div class="eyebrow" data-en="Dynamic programming · Markov decision process · Game theory">动态规划 · 马尔可夫决策过程 · 博弈</div>
+    <h1 data-en="Flea Jailbreak &lt;em&gt;Lab&lt;/em&gt;">跳蚤越狱<em>实验室</em></h1>
+    <p class="lede" data-en="There is a little food in the jar and a net over its mouth. Outside is a world of endless food, but every hit on the net injures the flea and shortens its life, and every jump costs energy. The net can change too: removed one day, opened on a schedule, or opened at random. This page uses dynamic programming to compute the exact best choice in every situation, then asks how a jailer should schedule the openings to make escape as hard as possible.">罐子里有一点食物，罐口有网。跳出去就是吃不完的世界，但每次撞网都会受伤、缩短寿命，每一跳还要花力气。网也可能变：某天突然被拿走，定时打开，或者随机打开。这一页用动态规划把每种处境下的最优选择精确算出来，再看看看守者该怎么安排开网，才能让跳蚤最难逃出去。</p>
   </header>
 
   <section class="bench">
     <div class="panel jarbox">
       <div class="row" style="justify-content:space-between;margin-bottom:8px">
-        <h2>现场观察</h2>
+        <h2 data-en="Live view">现场观察</h2>
         <div class="row">
-          <button class="primary" id="btnPlay">暂停</button>
-          <button id="btnRestart">换一只跳蚤</button>
-          <label for="speed" class="eyebrow">速度</label>
-          <select id="speed"><option value="0.6">慢</option><option value="1" selected>正常</option><option value="2.5">快</option><option value="6">极快</option></select>
+          <button class="primary" id="btnPlay" data-en="Pause">暂停</button>
+          <button id="btnRestart" data-en="New flea">换一只跳蚤</button>
+          <label for="speed" class="eyebrow" data-en="Speed">速度</label>
+          <select id="speed"><option value="0.6" data-en="Slow">慢</option><option value="1" selected data-en="Normal">正常</option><option value="2.5" data-en="Fast">快</option><option value="6" data-en="Very fast">极快</option></select>
         </div>
       </div>
-      <canvas id="jar" width="560" height="400" aria-label="罐子和跳蚤的动画"></canvas>
+      <canvas id="jar" width="560" height="400" aria-label="罐子和跳蚤的动画" data-en-aria="Animation of the jar and the flea"></canvas>
       <div class="hud">
-        <div><span class="eyebrow">第几天</span><b id="hDay">0</b></div>
-        <div><span class="eyebrow">能量</span><b id="hE">0</b><div class="bar"><i id="bE"></i></div></div>
-        <div><span class="eyebrow">健康</span><b id="hH">10</b><div class="bar h"><i id="bH"></i></div></div>
-        <div><span class="eyebrow">罐内食物</span><b id="hF">0</b><div class="bar f"><i id="bF"></i></div></div>
-        <div><span class="eyebrow">今天的网</span><b id="hN" style="font-size:15px">固定</b></div>
+        <div><span class="eyebrow" data-en="Day">第几天</span><b id="hDay">0</b></div>
+        <div><span class="eyebrow" data-en="Energy">能量</span><b id="hE">0</b><div class="bar"><i id="bE"></i></div></div>
+        <div><span class="eyebrow" data-en="Health">健康</span><b id="hH">10</b><div class="bar h"><i id="bH"></i></div></div>
+        <div><span class="eyebrow" data-en="Food in jar">罐内食物</span><b id="hF">0</b><div class="bar f"><i id="bF"></i></div></div>
+        <div><span class="eyebrow" data-en="Net today">今天的网</span><b id="hN" style="font-size:15px" data-en="fixed">固定</b></div>
       </div>
       <div class="log" id="log" aria-live="polite"></div>
     </div>
 
     <div class="panel">
-      <h2 style="margin-bottom:10px">实验条件</h2>
+      <h2 style="margin-bottom:10px" data-en="Conditions">实验条件</h2>
       <div class="presets" id="presets"></div>
       <div class="ctl" id="ctl"></div>
     </div>
@@ -164,90 +169,90 @@ button.ref:hover{color:var(--amber)}
       <div class="stats" id="mc"></div>
     </div>
     <div>
-      <div class="eyebrow" style="margin-bottom:10px">和几种“直觉策略”比较</div>
+      <div class="eyebrow" style="margin-bottom:10px" data-en="Compared with intuitive strategies">和几种“直觉策略”比较</div>
       <div class="cmp" id="cmp"></div>
       <p class="note" id="insight"></p>
     </div>
   </section>
 
   <section class="panel" id="jailPanel">
-    <h2>看守者 vs 跳蚤：怎么开网，跳蚤最难逃？</h2>
+    <h2 data-en="Jailer vs. flea: how should the net be opened to make escape hardest?">看守者 vs 跳蚤：怎么开网，跳蚤最难逃？</h2>
     <p class="note" id="jailIntro"></p>
     <div class="cmp" id="jail" style="margin-top:14px"></div>
     <p class="note" id="jailNote" style="margin-top:12px"></p>
   </section>
 
   <section class="panel" id="lhPanel">
-    <h2>习得性无助：网被悄悄拿走以后</h2>
-    <p class="note">这里的跳蚤不知道网有多密，只能从自己撞网的经历里估计（贝叶斯更新）：撞得越多，越相信网很密。网在某一天被悄悄拿走，跳蚤看不出来，只有再跳一次才会发现。它会不会撞怕了、从此不跳，就这样困死在一个早已没有网的罐子里？网的真实密度、撞网伤害、食物等沿用上面的设置。</p>
+    <h2 data-en="Learned helplessness: after the net is quietly removed">习得性无助：网被悄悄拿走以后</h2>
+    <p class="note" data-en="This flea doesn’t know how dense the net is. It can only estimate that from its own hits (Bayesian updating): the more it hits, the denser it believes the net is. One day the net is quietly removed. The flea can’t see this and will only find out by jumping again. Will it become too afraid to jump, and stay trapped in a jar that no longer has a net? The true density, damage, food and so on come from the settings above.">这里的跳蚤不知道网有多密，只能从自己撞网的经历里估计（贝叶斯更新）：撞得越多，越相信网很密。网在某一天被悄悄拿走，跳蚤看不出来，只有再跳一次才会发现。它会不会撞怕了、从此不跳，就这样困死在一个早已没有网的罐子里？网的真实密度、撞网伤害、食物等沿用上面的设置。</p>
     <div class="row" style="margin:12px 0 4px">
-      <button id="lhClassic">经典实验设置</button>
-      <label for="lhWho" class="eyebrow">演示</label>
-      <select id="lhWho"><option value="A">A · 认为网永远不会变</option><option value="B">B · 认为网可能被拿走</option><option value="C">C · 偶尔试探</option><option value="D">D · 撞 2 次就放弃</option></select>
-      <button class="primary" id="lhDemo">在现场观察里演示</button>
-      <button id="lhStop">回到普通模式</button>
+      <button id="lhClassic" data-en="Classic setup">经典实验设置</button>
+      <label for="lhWho" class="eyebrow" data-en="Demo">演示</label>
+      <select id="lhWho"><option value="A" data-en="A · Believes the net never changes">A · 认为网永远不会变</option><option value="B" data-en="B · Believes the net may be removed">B · 认为网可能被拿走</option><option value="C" data-en="C · Probes now and then">C · 偶尔试探</option><option value="D" data-en="D · Gives up after 2 hits">D · 撞 2 次就放弃</option></select>
+      <button class="primary" id="lhDemo" data-en="Show in live view">在现场观察里演示</button>
+      <button id="lhStop" data-en="Back to normal mode">回到普通模式</button>
     </div>
     <div class="ctl" id="lhCtl" style="max-width:560px;margin-top:8px"></div>
     <div class="cmp" id="lhRows" style="margin-top:16px;gap:14px"></div>
     <div class="plates" style="margin-top:18px">
-      <div style="min-width:0"><div class="eyebrow" style="margin-bottom:6px">A 越撞越悲观：估计的全力跳穿网率</div><div class="scroll"><svg id="lhC1"></svg></div></div>
-      <div style="min-width:0"><div class="eyebrow" id="lhC2t" style="margin-bottom:6px">B 隔得越久越敢再试</div><div class="scroll"><svg id="lhC2"></svg></div></div>
+      <div style="min-width:0"><div class="eyebrow" style="margin-bottom:6px" data-en="A grows more pessimistic with each hit: estimated full-jump pass rate">A 越撞越悲观：估计的全力跳穿网率</div><div class="scroll"><svg id="lhC1"></svg></div></div>
+      <div style="min-width:0"><div class="eyebrow" id="lhC2t" style="margin-bottom:6px" data-en="B dares to retry the longer it waits">B 隔得越久越敢再试</div><div class="scroll"><svg id="lhC2"></svg></div></div>
     </div>
-    <p class="note">阴影表示在满血、能量满、罐里还有一半食物时，跳蚤仍然会选择跳；红色虚线是放弃（左图）或重新尝试（右图）的分界。</p>
+    <p class="note" data-en="Shading: at full health, full energy and half the food left, the flea would still choose to jump. The red dashed line marks where it gives up (left) or tries again (right).">阴影表示在满血、能量满、罐里还有一半食物时，跳蚤仍然会选择跳；红色虚线是放弃（左图）或重新尝试（右图）的分界。</p>
     <p class="note" id="lhNote" style="margin-top:10px;color:var(--ink)"></p>
   </section>
 
   <section class="plates">
     <div class="panel">
-      <h2>策略地图</h2>
-      <p class="note">每个格子是一种处境：横轴是罐里剩多少食物，纵轴是跳蚤自己的能量。颜色是那一刻的最优动作。</p>
+      <h2 data-en="Strategy map">策略地图</h2>
+      <p class="note" data-en="Each cell is a situation: across is the food left in the jar, up is the flea’s energy. The color is the best action at that moment.">每个格子是一种处境：横轴是罐里剩多少食物，纵轴是跳蚤自己的能量。颜色是那一刻的最优动作。</p>
       <div class="ctl" style="margin:10px 0 6px">
-        <label for="mapH">看健康值为</label><input type="range" id="mapH" min="1" max="10" value="10"><output id="mapHo">10</output>
-        <label for="mapN" class="mapN">看网的状态</label><input type="range" id="mapN" class="mapN" min="0" max="0" value="0"><output id="mapNo" class="mapN"></output>
+        <label for="mapH" data-en="Health level">看健康值为</label><input type="range" id="mapH" min="1" max="10" value="10"><output id="mapHo">10</output>
+        <label for="mapN" class="mapN" data-en="Net state">看网的状态</label><input type="range" id="mapN" class="mapN" min="0" max="0" value="0"><output id="mapNo" class="mapN"></output>
         <span class="mapN note" id="mapNl" style="grid-column:2/-1;margin:0"></span>
       </div>
       <div class="scroll"><svg id="map" role="img" aria-label="策略地图"></svg></div>
       <div class="legend" id="legend"></div>
-      <p class="note">点任意一个格子，下面会展开这个处境的贝尔曼方程。</p>
+      <p class="note" data-en="Click any cell to expand that situation’s Bellman equation below.">点任意一个格子，下面会展开这个处境的贝尔曼方程。</p>
     </div>
     <div class="panel">
-      <h2>网越密，越该怎么办？</h2>
-      <p class="note">其他条件不变，只改变（关着时的）网密度。实线是寿命，虚线是最优策略下最终逃出去的概率。</p>
+      <h2 data-en="As the net gets denser, what should the flea do?">网越密，越该怎么办？</h2>
+      <p class="note" data-en="Everything else is fixed; only the (closed) net density changes. Solid lines are lifespans; the dashed line is the chance of eventually escaping under the optimal strategy.">其他条件不变，只改变（关着时的）网密度。实线是寿命，虚线是最优策略下最终逃出去的概率。</p>
       <div class="scroll"><svg id="sweep" role="img" aria-label="网密度扫描图"></svg></div>
       <div class="legend" id="legend2"></div>
     </div>
   </section>
 
   <section class="panel" id="scanPanel">
-    <h2>临界点扫描</h2>
-    <p class="note">选一个参数，其他条件保持上面的设置，把它从最小拉到最大，看寿命、逃出率和首跳日怎么变。突然变化的地方会被标出来：红色是寿命突变，灰色是行为翻转。</p>
-    <div class="row" style="margin:12px 0 8px"><label for="scanP" class="eyebrow">扫描参数</label><select id="scanP"></select></div>
+    <h2 data-en="Tipping-point scanner">临界点扫描</h2>
+    <p class="note" data-en="Pick a parameter. With everything else at the settings above, it is swept from minimum to maximum to show how lifespan, escape odds and the first-jump day change. Sudden changes are marked: red for a lifespan jump, grey for a behavior flip.">选一个参数，其他条件保持上面的设置，把它从最小拉到最大，看寿命、逃出率和首跳日怎么变。突然变化的地方会被标出来：红色是寿命突变，灰色是行为翻转。</p>
+    <div class="row" style="margin:12px 0 8px"><label for="scanP" class="eyebrow" data-en="Parameter">扫描参数</label><select id="scanP"></select></div>
     <div class="scroll"><svg id="scanSvg"></svg></div>
-    <div class="legend"><span><i style="background:var(--amber)"></i>预期寿命（左轴）</span><span><i style="background:var(--danger)"></i>逃出概率（右轴，虚线）</span><span><i style="background:var(--a-j3)"></i>首跳日（点的颜色是跳的力度，× 表示不跳）</span><span><i style="background:var(--danger);opacity:.35"></i>寿命突变</span><span><i style="background:var(--mesh);opacity:.35"></i>行为翻转</span></div>
+    <div class="legend" data-en="&lt;span&gt;&lt;i style=&quot;background:var(--amber)&quot;&gt;&lt;/i&gt;Expected lifespan (left axis)&lt;/span&gt;&lt;span&gt;&lt;i style=&quot;background:var(--danger)&quot;&gt;&lt;/i&gt;Escape probability (right axis, dashed)&lt;/span&gt;&lt;span&gt;&lt;i style=&quot;background:var(--a-j3)&quot;&gt;&lt;/i&gt;First-jump day (dot color = jump strength, × = no jump)&lt;/span&gt;&lt;span&gt;&lt;i style=&quot;background:var(--danger);opacity:.35&quot;&gt;&lt;/i&gt;Lifespan jump&lt;/span&gt;&lt;span&gt;&lt;i style=&quot;background:var(--mesh);opacity:.35&quot;&gt;&lt;/i&gt;Behavior flip&lt;/span&gt;"><span><i style="background:var(--amber)"></i>预期寿命（左轴）</span><span><i style="background:var(--danger)"></i>逃出概率（右轴，虚线）</span><span><i style="background:var(--a-j3)"></i>首跳日（点的颜色是跳的力度，× 表示不跳）</span><span><i style="background:var(--danger);opacity:.35"></i>寿命突变</span><span><i style="background:var(--mesh);opacity:.35"></i>行为翻转</span></div>
     <p class="note" id="scanNote" style="color:var(--ink);margin-top:10px"></p>
     <div id="scanList" style="margin-top:6px"></div>
   </section>
 
   <section class="panel" id="bellPanel">
-    <h2>贝尔曼方程展开</h2>
+    <h2 data-en="Bellman equation, expanded">贝尔曼方程展开</h2>
     <p class="note" id="bellIntro"></p>
     <div class="bellhead" id="bellState"></div>
     <div class="scroll"><table class="bell" id="bell"></table></div>
-    <p class="note">表里带下划线的 V(…) 是另一个处境的价值，它们都是更早一步已经算好的格子，点一下可以跳过去继续往下追。网会变化时，明天的网状态有几种可能，就按概率加权。</p>
+    <p class="note" data-en="Underlined V(…) terms are the values of other situations, each computed one step earlier. Click one to jump there and keep tracing. When the net can change, tomorrow’s possible net states are weighted by probability.">表里带下划线的 V(…) 是另一个处境的价值，它们都是更早一步已经算好的格子，点一下可以跳过去继续往下追。网会变化时，明天的网状态有几种可能，就按概率加权。</p>
   </section>
 
   <section class="panel">
-    <h2 style="margin-bottom:12px">这个世界的规则</h2>
+    <h2 style="margin-bottom:12px" data-en="Rules of this world">这个世界的规则</h2>
     <div class="rules">
-      <p><b>状态。</b>跳蚤在罐内时的处境由能量 <code>e</code>（0–20）、健康 <code>h</code>（0–10）、罐内剩余食物 <code>f</code> 和网的状态 <code>n</code> 决定。能量归零饿死，健康归零死亡。</p>
-      <p><b>每天都可能自然死亡。</b>每天的死亡概率 = 基础死亡率 + 伤病系数 × 已损失的健康，再加上所在环境的风险（罐内闷热霉变，或罐外的天敌）。撞网会一直抬高这个概率；罐内风险让“一直等着”也有代价。</p>
-      <p><b>每天的选择。</b>吃一份食物（能量 +食物能量，罐内食物 −1）；休息（有一定概率恢复 1 点健康）；或者以轻 / 中 / 全力三档跳。所有动作都要先付每日代谢。</p>
-      <p><b>跳跃。</b>力度 a = 1、2、3，耗能 = 跳跃耗能 × a。穿网概率 = 1 − 网密度<sup>0.8a</sup>；撞网伤害随力度增加（1×、1.5×、2× 基础伤害）。网被拿走（密度 0）时一跳必过。</p>
-      <p><b>会变的网。</b>“开网”时网密度变成“开网时密度”。只开一次和定时打开是固定日程，跳蚤会数日子，所以总能预知。随机打开是每天独立抽签；成团打开是一旦打开会持续几天（马尔可夫链）。每种方式都从网关着开始。</p>
-      <p><b>看不看得见。</b>看得见时跳蚤每天知道网开没开。看不见时它只能根据规律和自己撞网的结果推测网开着的概率（贝叶斯更新），这个“信念”成了状态的一部分。</p>
-      <p><b>罐外。</b>食物无限，不再有饿死的问题，伤势也能慢慢恢复，但要承担罐外风险。罐外的预期寿命可以精确算出。</p>
-      <p><b>两种目标。</b>“活得最久”最大化预期寿命；“逃出去的概率最高”最大化最终到达罐外的概率，不在乎活多久。看守者 vs 跳蚤的排名用后者：跳蚤知道看守者的安排并做出最好的应对，看守者选让这个最好成绩最低的安排。</p>
-      <p><b>怎么求最优。</b>每个动作要么让罐内食物减少，要么让能量减少，所以按 (食物, 能量) 从小到大逐个做一次贝尔曼递推就能得到精确最优解。所有对比策略也用同一套方程算出。</p>
+      <p data-en="&lt;b&gt;State.&lt;/b&gt; Inside the jar, the flea’s situation is set by energy &lt;code&gt;e&lt;/code&gt; (0–20), health &lt;code&gt;h&lt;/code&gt; (0–10), food left &lt;code&gt;f&lt;/code&gt; and the net state &lt;code&gt;n&lt;/code&gt;. Zero energy means starvation; zero health means death."><b>状态。</b>跳蚤在罐内时的处境由能量 <code>e</code>（0–20）、健康 <code>h</code>（0–10）、罐内剩余食物 <code>f</code> 和网的状态 <code>n</code> 决定。能量归零饿死，健康归零死亡。</p>
+      <p data-en="&lt;b&gt;Natural death, every day.&lt;/b&gt; Daily death probability = base death rate + injury factor × health lost, plus the risk of where it is (a stuffy, moldy jar, or predators outside). Hitting the net raises it for good; risk inside the jar means waiting has a cost too."><b>每天都可能自然死亡。</b>每天的死亡概率 = 基础死亡率 + 伤病系数 × 已损失的健康，再加上所在环境的风险（罐内闷热霉变，或罐外的天敌）。撞网会一直抬高这个概率；罐内风险让“一直等着”也有代价。</p>
+      <p data-en="&lt;b&gt;Daily choices.&lt;/b&gt; Eat one portion (energy + food energy, food −1); rest (some chance to recover 1 health); or jump light, medium or full. Every action first pays the daily metabolism."><b>每天的选择。</b>吃一份食物（能量 +食物能量，罐内食物 −1）；休息（有一定概率恢复 1 点健康）；或者以轻 / 中 / 全力三档跳。所有动作都要先付每日代谢。</p>
+      <p data-en="&lt;b&gt;Jumping.&lt;/b&gt; Strength a = 1, 2, 3 costs jump cost × a energy. Pass probability = 1 − density&lt;sup&gt;0.8a&lt;/sup&gt;; damage grows with strength (1×, 1.5×, 2× base damage). With the net removed (density 0), every jump gets through."><b>跳跃。</b>力度 a = 1、2、3，耗能 = 跳跃耗能 × a。穿网概率 = 1 − 网密度<sup>0.8a</sup>；撞网伤害随力度增加（1×、1.5×、2× 基础伤害）。网被拿走（密度 0）时一跳必过。</p>
+      <p data-en="&lt;b&gt;A changing net.&lt;/b&gt; When the net “opens”, its density becomes the open density. “Opens once” and “on a schedule” are fixed timetables; the flea counts days, so it always knows what is coming. “At random” draws independently each day; “in bursts” stays open for several days once opened (a Markov chain). Every pattern starts with the net closed."><b>会变的网。</b>“开网”时网密度变成“开网时密度”。只开一次和定时打开是固定日程，跳蚤会数日子，所以总能预知。随机打开是每天独立抽签；成团打开是一旦打开会持续几天（马尔可夫链）。每种方式都从网关着开始。</p>
+      <p data-en="&lt;b&gt;Can it see?&lt;/b&gt; If it can, the flea knows each day whether the net is open. If not, it infers the probability from the pattern and its own hits (Bayesian updating), and that belief becomes part of the state."><b>看不看得见。</b>看得见时跳蚤每天知道网开没开。看不见时它只能根据规律和自己撞网的结果推测网开着的概率（贝叶斯更新），这个“信念”成了状态的一部分。</p>
+      <p data-en="&lt;b&gt;Outside.&lt;/b&gt; Food is unlimited, so there is no starvation, and injuries slowly heal, but there is outside risk. Expected life outside can be computed exactly."><b>罐外。</b>食物无限，不再有饿死的问题，伤势也能慢慢恢复，但要承担罐外风险。罐外的预期寿命可以精确算出。</p>
+      <p data-en="&lt;b&gt;Two goals.&lt;/b&gt; “Longest life” maximizes expected lifespan; “best escape odds” maximizes the chance of eventually getting out, however long it lives. The jailer-vs-flea ranking uses the second: the flea knows the jailer’s pattern and responds as well as it can, and the jailer picks the pattern that minimizes that best result."><b>两种目标。</b>“活得最久”最大化预期寿命；“逃出去的概率最高”最大化最终到达罐外的概率，不在乎活多久。看守者 vs 跳蚤的排名用后者：跳蚤知道看守者的安排并做出最好的应对，看守者选让这个最好成绩最低的安排。</p>
+      <p data-en="&lt;b&gt;Finding the optimum.&lt;/b&gt; Every action either reduces the food in the jar or reduces energy, so one Bellman pass over (food, energy) from small to large gives the exact optimum. All comparison strategies use the same equations."><b>怎么求最优。</b>每个动作要么让罐内食物减少，要么让能量减少，所以按 (食物, 能量) 从小到大逐个做一次贝尔曼递推就能得到精确最优解。所有对比策略也用同一套方程算出。</p>
     </div>
   </section>
 </div>
@@ -255,50 +260,60 @@ button.ref:hover{color:var(--amber)}
 
 <script>
 (function(){
+const LANG=(()=>{const q=new URLSearchParams(location.search).get('lang');
+  if(q==='en'||q==='zh'){try{localStorage.setItem('flea-lang',q);}catch(e){}return q;}
+  try{const v=localStorage.getItem('flea-lang');if(v==='en'||v==='zh')return v;}catch(e){}
+  return (navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en';})();
+const EN=LANG==='en',tl=(zh,en)=>EN?en:zh;
+document.documentElement.lang=EN?'en':'zh-CN';
+if(EN){document.title='Flea Jailbreak Lab';
+  document.querySelectorAll('[data-en]').forEach(el=>{el.innerHTML=el.dataset.en;});
+  document.querySelectorAll('[data-en-aria]').forEach(el=>el.setAttribute('aria-label',el.dataset.enAria));}
+document.querySelectorAll('.langsw a').forEach(a=>a.classList.toggle('on',a.dataset.l===LANG));
 const EMAX=20, HMAX=10, BB=41;
-const ACT=[{k:'eat',n:'吃',c:'--a-eat'},{k:'rest',n:'休息',c:'--a-rest'},{k:'j1',n:'轻跳',c:'--a-j1'},{k:'j2',n:'中跳',c:'--a-j2'},{k:'j3',n:'全力跳',c:'--a-j3'}];
+const ACT=[{k:'eat',n:tl('吃','Eat'),c:'--a-eat'},{k:'rest',n:tl('休息','Rest'),c:'--a-rest'},{k:'j1',n:tl('轻跳','Light jump'),c:'--a-j1'},{k:'j2',n:tl('中跳','Medium jump'),c:'--a-j2'},{k:'j3',n:tl('全力跳','Full jump'),c:'--a-j3'}];
 const DEF={d:0.6,F0:12,e0:8,g:3,m:1,jc:1,dmg:2,h0:0.01,k:0.008,rho:0.002,rin:0.006,r:0.15,
   obj:'life',sched:'const',dOpen:0,tau:0.1,L:1,off:20,vis:'yes',lhT:8,lhMu:0.5,lhQ:0.05};
-const SCHED=[['const','固定不变'],['once','某天打开一次'],['periodic','定时打开'],['random','随机打开'],['burst','成团打开']];
+const SCHED=[['const',tl('固定不变','Fixed')],['once',tl('某天打开一次','Opens once')],['periodic',tl('定时打开','On a schedule')],['random',tl('随机打开','At random')],['burst',tl('成团打开','In bursts')]];
 const pct=v=>Math.round(v*100)+'%';
 const CTL=[
-  {grp:'跳蚤的目标'},
-  {id:'obj',n:'追求',type:'sel',opts:[['life','活得最久'],['escape','逃出去的概率最高']]},
-  {grp:'罐子'},
-  {id:'d',n:'网密度',min:0,max:0.95,step:0.05,fmt:pct},
-  {id:'dmg',n:'撞网伤害',min:1,max:5,step:1,fmt:v=>v+' 点'},
-  {id:'F0',n:'罐内食物',min:0,max:40,step:1,fmt:v=>v+' 份'},
-  {id:'g',n:'每份能量',min:1,max:6,step:1,fmt:v=>'+'+v},
-  {grp:'网的变化'},
-  {id:'sched',n:'变化方式',type:'sel',opts:SCHED},
-  {id:'dOpen',n:'开网时密度',min:0,max:0.9,step:0.05,fmt:v=>v===0?'没网':pct(v),show:s=>s!=='const'},
-  {id:'tau',n:'开网天数占比',min:0.05,max:0.5,step:0.05,fmt:pct,show:s=>['periodic','random','burst'].includes(s)},
-  {id:'L',n:'每次开几天',min:1,max:6,step:1,fmt:v=>v+' 天',show:s=>['once','periodic','burst'].includes(s)},
-  {id:'off',n:'第一次开网',min:0,max:60,step:1,fmt:v=>'第 '+v+' 天',show:s=>['once','periodic'].includes(s)},
-  {id:'vis',n:'看得见网吗',type:'sel',opts:[['yes','看得见'],['no','看不见']],show:s=>['random','burst'].includes(s)},
-  {grp:'跳蚤'},
-  {id:'e0',n:'初始能量',min:1,max:20,step:1,fmt:v=>v},
-  {id:'m',n:'每日代谢',min:1,max:3,step:1,fmt:v=>'−'+v},
-  {id:'jc',n:'跳跃耗能',min:1,max:3,step:1,fmt:v=>'×'+v},
-  {id:'r',n:'休息回血率',min:0,max:0.5,step:0.05,fmt:pct},
-  {grp:'死亡风险（每天）'},
-  {id:'h0',n:'基础死亡率',min:0.002,max:0.04,step:0.002,fmt:v=>(v*100).toFixed(1)+'%'},
-  {id:'k',n:'伤病系数',min:0,max:0.03,step:0.002,fmt:v=>(v*100).toFixed(1)+'%'},
-  {id:'rin',n:'罐内风险',min:0,max:0.05,step:0.002,fmt:v=>(v*100).toFixed(1)+'%'},
-  {id:'rho',n:'罐外风险',min:0,max:0.08,step:0.005,fmt:v=>(v*100).toFixed(1)+'%'},
+  {grp:tl('跳蚤的目标','Goal')},
+  {id:'obj',n:tl('追求','Aim for'),type:'sel',opts:[['life',tl('活得最久','Longest life')],['escape',tl('逃出去的概率最高','Best escape odds')]]},
+  {grp:tl('罐子','Jar')},
+  {id:'d',n:tl('网密度','Net density'),min:0,max:0.95,step:0.05,fmt:pct},
+  {id:'dmg',n:tl('撞网伤害','Hit damage'),min:1,max:5,step:1,fmt:v=>v+tl(' 点',' pt')},
+  {id:'F0',n:tl('罐内食物','Food in jar'),min:0,max:40,step:1,fmt:v=>v+tl(' 份','')},
+  {id:'g',n:tl('每份能量','Energy per portion'),min:1,max:6,step:1,fmt:v=>'+'+v},
+  {grp:tl('网的变化','Net changes')},
+  {id:'sched',n:tl('变化方式','Pattern'),type:'sel',opts:SCHED},
+  {id:'dOpen',n:tl('开网时密度','Open density'),min:0,max:0.9,step:0.05,fmt:v=>v===0?tl('没网','no net'):pct(v),show:s=>s!=='const'},
+  {id:'tau',n:tl('开网天数占比','Share of open days'),min:0.05,max:0.5,step:0.05,fmt:pct,show:s=>['periodic','random','burst'].includes(s)},
+  {id:'L',n:tl('每次开几天','Days per opening'),min:1,max:6,step:1,fmt:v=>v+tl(' 天',' d'),show:s=>['once','periodic','burst'].includes(s)},
+  {id:'off',n:tl('第一次开网','First opening'),min:0,max:60,step:1,fmt:v=>tl('第 '+v+' 天','day '+v),show:s=>['once','periodic'].includes(s)},
+  {id:'vis',n:tl('看得见网吗','Can it see the net?'),type:'sel',opts:[['yes',tl('看得见','Yes')],['no',tl('看不见','No')]],show:s=>['random','burst'].includes(s)},
+  {grp:tl('跳蚤','Flea')},
+  {id:'e0',n:tl('初始能量','Starting energy'),min:1,max:20,step:1,fmt:v=>v},
+  {id:'m',n:tl('每日代谢','Daily metabolism'),min:1,max:3,step:1,fmt:v=>'−'+v},
+  {id:'jc',n:tl('跳跃耗能','Jump cost'),min:1,max:3,step:1,fmt:v=>'×'+v},
+  {id:'r',n:tl('休息回血率','Healing when resting'),min:0,max:0.5,step:0.05,fmt:pct},
+  {grp:tl('死亡风险（每天）','Death risk (per day)')},
+  {id:'h0',n:tl('基础死亡率','Base death rate'),min:0.002,max:0.04,step:0.002,fmt:v=>(v*100).toFixed(1)+'%'},
+  {id:'k',n:tl('伤病系数','Injury factor'),min:0,max:0.03,step:0.002,fmt:v=>(v*100).toFixed(1)+'%'},
+  {id:'rin',n:tl('罐内风险','Risk inside'),min:0,max:0.05,step:0.002,fmt:v=>(v*100).toFixed(1)+'%'},
+  {id:'rho',n:tl('罐外风险','Risk outside'),min:0,max:0.08,step:0.005,fmt:v=>(v*100).toFixed(1)+'%'},
 ];
 const PRESETS=[
-  {n:'默认',p:{}},
-  {n:'稀疏网',p:{d:0.2}},
-  {n:'密网 + 粮多',p:{d:0.9,F0:40,dmg:3}},
-  {n:'外面很危险',p:{rho:0.03,F0:30}},
-  {n:'罐里闷热',p:{rin:0.025,d:0.75}},
-  {n:'钢丝网',p:{d:0.7,dmg:5,k:0.02}},
-  {n:'某天突然没网',p:{sched:'once',off:25,L:1,d:0.9,dmg:3}},
-  {n:'定时开网',p:{sched:'periodic',tau:0.1,L:1,off:9,d:0.85,obj:'escape'}},
-  {n:'随机开网',p:{sched:'random',tau:0.1,d:0.85,obj:'escape'}},
-  {n:'随机开网 · 看不见',p:{sched:'random',tau:0.1,d:0.85,vis:'no',obj:'escape'}},
-  {n:'成团开网',p:{sched:'burst',tau:0.1,L:4,d:0.85,obj:'escape'}},
+  {n:tl('默认','Default'),p:{}},
+  {n:tl('稀疏网','Sparse net'),p:{d:0.2}},
+  {n:tl('密网 + 粮多','Dense net + lots of food'),p:{d:0.9,F0:40,dmg:3}},
+  {n:tl('外面很危险','Dangerous outside'),p:{rho:0.03,F0:30}},
+  {n:tl('罐里闷热','Stuffy jar'),p:{rin:0.025,d:0.75}},
+  {n:tl('钢丝网','Wire net'),p:{d:0.7,dmg:5,k:0.02}},
+  {n:tl('某天突然没网','Net gone one day'),p:{sched:'once',off:25,L:1,d:0.9,dmg:3}},
+  {n:tl('定时开网','Scheduled opening'),p:{sched:'periodic',tau:0.1,L:1,off:9,d:0.85,obj:'escape'}},
+  {n:tl('随机开网','Random opening'),p:{sched:'random',tau:0.1,d:0.85,obj:'escape'}},
+  {n:tl('随机开网 · 看不见','Random opening · unseen'),p:{sched:'random',tau:0.1,d:0.85,vis:'no',obj:'escape'}},
+  {n:tl('成团开网','Opens in bursts'),p:{sched:'burst',tau:0.1,L:4,d:0.85,obj:'escape'}},
 ];
 let P={...DEF};
 
@@ -319,21 +334,21 @@ function buildNet(){
     const off=P.off,n=off+L+1,isOpen=[],next=[];
     for(let i=0;i<n;i++){isOpen.push(i>=off&&i<off+L?1:0);next.push([[1,Math.min(i+1,n-1)]]);}
     return det(isOpen,next,0,
-      i=>i<off?`网关着，还有 ${off-i} 天开网`:i<off+L?`网开着（第 ${i-off+1}/${L} 天）`:'网已经关回去，不会再开',
-      i=>i<off?`${off-i}天后开`:i<off+L?'开':'永久关',{off});
+      i=>i<off?tl(`网关着，还有 ${off-i} 天开网`,`Net closed, opens in ${off-i} days`):i<off+L?tl(`网开着（第 ${i-off+1}/${L} 天）`,`Net open (day ${i-off+1}/${L})`):tl('网已经关回去，不会再开','Net closed again, for good'),
+      i=>i<off?tl(`${off-i}天后开`,`opens in ${off-i}d`):i<off+L?tl('开','open'):tl('永久关','closed for good'),{off});
   }
   if(s==='periodic'){
     const T=periodT(),off=Math.min(P.off,T-L),isOpen=[],next=[];
     for(let c=0;c<T;c++){isOpen.push(c<L?1:0);next.push([[1,(c+1)%T]]);}
     return det(isOpen,next,off===0?0:T-off,
-      c=>c<L?`网开着（第 ${c+1}/${L} 天）`:`网关着，还有 ${T-c} 天开网`,
-      c=>c<L?'开':`${T-c}天后开`,{T,off});
+      c=>c<L?tl(`网开着（第 ${c+1}/${L} 天）`,`Net open (day ${c+1}/${L})`):tl(`网关着，还有 ${T-c} 天开网`,`Net closed, opens in ${T-c} days`),
+      c=>c<L?tl('开','open'):tl(`${T-c}天后开`,`opens in ${T-c}d`),{T,off});
   }
   if(s==='random'||s==='burst'){
     const tau=P.tau,a=s==='random'?tau:1-1/L,bco=s==='random'?tau:Math.min(1,tau/(L*(1-tau)));
     const markov={a,bco};
     if(P.vis==='yes')return det([0,1],[[[1-bco,0],[bco,1]],[[1-a,0],[a,1]]],0,
-      i=>i?'网开着':'网关着',i=>i?'开':'关',{markov});
+      i=>i?tl('网开着','Net open'):tl('网关着','Net closed'),i=>i?tl('开','open'):tl('关','closed'),{markov});
     // blind flea: state = belief that the net is open today, on a grid of BB points
     const interp=b=>{const x=Math.max(0,Math.min(1,b))*(BB-1),i0=Math.min(BB-2,Math.floor(x)),w=x-i0;
       return w<1e-9?[[1,i0]]:w>1-1e-9?[[1,i0+1]]:[[1-w,i0],[w,i0+1]];};
@@ -344,9 +359,9 @@ function buildNet(){
     return {n:BB,blind:true,init:0,markov,
       pp:(i,j)=>{const b=i/(BB-1);return b*passD(po,j)+(1-b)*passD(pc,j);},
       tr:(i,j)=>TR[j][i],open:i=>i/(BB-1),
-      label:i=>`跳蚤估计今天网开着的概率是 ${pct(i/(BB-1))}`,short:i=>`估${pct(i/(BB-1))}开`};
+      label:i=>tl(`跳蚤估计今天网开着的概率是 ${pct(i/(BB-1))}`,`The flea puts the chance the net is open today at ${pct(i/(BB-1))}`),short:i=>tl(`估${pct(i/(BB-1))}开`,`est. ${pct(i/(BB-1))} open`)};
   }
-  return det([0],[[[1,0]]],0,()=>'网一直不变',()=>'',{});
+  return det([0],[[[1,0]]],0,()=>tl('网一直不变','The net never changes'),()=>'',{});
 }
 
 // exact DP over (f, e, h, n); allow(a,e,f,h,n,net) restricts actions for baseline strategies
@@ -383,11 +398,11 @@ function solve(F0,allow,net){
 
 let NET=null,SOL=null;
 const STRATS=[
-  {n:'最优策略',allow:null},
-  {n:'永远不跳',allow:a=>a<2},
-  {n:'吃光再跳',allow:(a,e,f)=>a<2||f===0},
-  {n:'一上来就全力跳',allow:(a,e,f)=>{const can=e-P.m-3*P.jc>=0;return can?a===4:a<2;}},
-  {n:'只在网开时跳',allow:(a,e,f,h,n,net)=>a<2||net.open(n)>=0.5,netOnly:true},
+  {n:tl('最优策略','Optimal'),allow:null},
+  {n:tl('永远不跳','Never jump'),allow:a=>a<2},
+  {n:tl('吃光再跳','Eat everything, then jump'),allow:(a,e,f)=>a<2||f===0},
+  {n:tl('一上来就全力跳','Full jump right away'),allow:(a,e,f)=>{const can=e-P.m-3*P.jc>=0;return can?a===4:a<2;}},
+  {n:tl('只在网开时跳','Jump only when open'),allow:(a,e,f,h,n,net)=>a<2||net.open(n)>=0.5,netOnly:true},
 ];
 
 // ---------- controls ----------
@@ -405,7 +420,7 @@ CTL.forEach(c=>{
 });
 function sync(){CTL.forEach(c=>{if(c.grp)return;
   document.getElementById('c_'+c.id).value=P[c.id];
-  if(c.type!=='sel'){let t=c.fmt(P[c.id]);if(c.id==='off'&&P.sched==='periodic')t='第 '+Math.min(P.off,periodT()-P.L)+' 天';document.getElementById('o_'+c.id).textContent=t;}
+  if(c.type!=='sel'){let t=c.fmt(P[c.id]);if(c.id==='off'&&P.sched==='periodic'){const v=Math.min(P.off,periodT()-P.L);t=tl('第 '+v+' 天','day '+v);}document.getElementById('o_'+c.id).textContent=t;}
   const vis=!c.show||c.show(P.sched);document.querySelectorAll('.r_'+c.id).forEach(el=>el.hidden=!vis);
 });syncLh();}
 const prEl=document.getElementById('presets');
@@ -418,7 +433,7 @@ document.getElementById('legend').innerHTML=ACT.map(a=>`<span><i style="backgrou
 const esc=()=>P.obj==='escape';
 const i0=so=>so.id(P.e0,P.F0,HMAX,so.net.init);
 const metric=so=>esc()?so.X[i0(so)]:so.V[i0(so)];
-const fmtM=v=>esc()?(v*100).toFixed(1)+'%':v.toFixed(1)+' 天';
+const fmtM=v=>esc()?(v*100).toFixed(1)+'%':v.toFixed(1)+tl(' 天',' days');
 function likelyNext(lst){let b=lst[0];for(const x of lst)if(x[0]>b[0])b=x;return b[1];}
 function planText(){
   let e=P.e0,f=P.F0,h=HMAX,n=NET.init,seq=[],guard=0;
@@ -432,15 +447,15 @@ function planText(){
   const out=[];let i=0;
   while(i<seq.length&&out.length<16){
     const x=seq[i];
-    if(x.hit){out.push('<span class="sep">若失败 ↓</span>');i++;continue;}
+    if(x.hit){out.push(tl('<span class="sep">若失败 ↓</span>','<span class="sep">if it fails ↓</span>'));i++;continue;}
     let k=1;while(seq[i+k]&&seq[i+k].a===x.a&&seq[i+k].op===x.op)k++;
-    out.push(`<span class="tok" style="background:var(${ACT[x.a].c})${x.op?';outline:2px solid var(--food);outline-offset:1px':''}">${ACT[x.a].n}${k>1?' ×'+k:''}${x.op?' · 网开':''}</span>`);
+    out.push(`<span class="tok" style="background:var(${ACT[x.a].c})${x.op?';outline:2px solid var(--food);outline-offset:1px':''}">${ACT[x.a].n}${k>1?' ×'+k:''}${x.op?tl(' · 网开',' · open'):''}</span>`);
     i+=k;
   }
   const jumps=seq.some(x=>x.a>=2);
-  const cond=P.sched==='const'?'假设每一跳都撞网的最坏情况':'假设每一跳都失败，网按最可能的方式变化';
-  const pre=jumps?`从开局起，最优的行动顺序（${cond}）：`:'最优选择是<b>永远不跳</b>，守着罐子里的食物过完一生：';
-  return pre+'<br>'+out.join(' ')+(i<seq.length?' <span class="sep">…</span>':'')+(jumps?'':' <span class="sep">→ 饿死或老死</span>');
+  const cond=P.sched==='const'?tl('假设每一跳都撞网的最坏情况','assuming every jump hits the net'):tl('假设每一跳都失败，网按最可能的方式变化','assuming every jump fails and the net changes in its most likely way');
+  const pre=jumps?tl(`从开局起，最优的行动顺序（${cond}）：`,`Optimal sequence from the start (${cond}):`):tl('最优选择是<b>永远不跳</b>，守着罐子里的食物过完一生：','The best choice is to <b>never jump</b> and live out its life on the food in the jar:');
+  return pre+'<br>'+out.join(' ')+(i<seq.length?' <span class="sep">…</span>':'')+(jumps?'':tl(' <span class="sep">→ 饿死或老死</span>',' <span class="sep">→ starves or dies of old age</span>'));
 }
 
 // ---------- flea simulation (shared by Monte Carlo and the animation) ----------
@@ -500,38 +515,38 @@ function recompute(restart){
   const strats=STRATS.filter(s=>!s.netOnly||P.sched!=='const');
   const sols=strats.map(s=>s.allow?solve(P.F0,s.allow,NET):SOL);
   const vals=sols.map(metric);
-  document.getElementById('vLabel').textContent=esc()?'最优策略下逃出去的概率':'最优策略下的预期寿命';
-  document.getElementById('vBest').innerHTML=esc()?(vals[0]*100).toFixed(1)+'<small>%</small>':vals[0].toFixed(1)+'<small>天</small>';
+  document.getElementById('vLabel').textContent=esc()?tl('最优策略下逃出去的概率','Chance of escaping under the optimal strategy'):tl('最优策略下的预期寿命','Expected lifespan under the optimal strategy');
+  document.getElementById('vBest').innerHTML=esc()?(vals[0]*100).toFixed(1)+'<small>%</small>':vals[0].toFixed(1)+tl('<small>天</small>','<small>days</small>');
   document.getElementById('plan').innerHTML=planText();
   const mx=Math.max(...vals,1e-9);
   document.getElementById('cmp').innerHTML=strats.map((s,i)=>`<div class="it ${i===0?'best':''}"><span>${s.n}</span><div class="tr"><i style="width:${(vals[i]/mx*100).toFixed(1)}%"></i></div><span>${fmtM(vals[i])}</span></div>`).join('');
   const mc=monteCarlo(3000);
   const k0=i0(SOL);
-  document.getElementById('mc').innerHTML=(esc()?`<div><b>${SOL.V[k0].toFixed(1)}</b><span>这个策略下的预期寿命（天）</span></div>`:`<div><b>${(SOL.X[k0]*100).toFixed(0)}%</b><span>最终逃出的概率</span></div>`)+
-    `<div><b>${mc.hits.toFixed(2)}</b><span>平均撞网次数</span></div><div><b>${mc.esc?('第 '+mc.escDay.toFixed(1)+' 天'):'—'}</b><span>逃出者的平均越狱日</span></div>`+
-    (P.sched!=='const'&&mc.esc?`<div><b>${pct(mc.escOpen)}</b><span>逃出时网正开着的比例</span></div>`:'')+
-    `<div><b>${mc.life.toFixed(1)}</b><span>3000 只模拟跳蚤的平均寿命</span></div>`;
+  document.getElementById('mc').innerHTML=(esc()?`<div><b>${SOL.V[k0].toFixed(1)}</b><span>${tl('这个策略下的预期寿命（天）','Expected lifespan under this strategy (days)')}</span></div>`:`<div><b>${(SOL.X[k0]*100).toFixed(0)}%</b><span>${tl('最终逃出的概率','Chance of escaping')}</span></div>`)+
+    `<div><b>${mc.hits.toFixed(2)}</b><span>${tl('平均撞网次数','Average hits')}</span></div><div><b>${mc.esc?tl('第 '+mc.escDay.toFixed(1)+' 天','day '+mc.escDay.toFixed(1)):'—'}</b><span>${tl('逃出者的平均越狱日','Average escape day')}</span></div>`+
+    (P.sched!=='const'&&mc.esc?`<div><b>${pct(mc.escOpen)}</b><span>${tl('逃出时网正开着的比例','Escapes made while the net was open')}</span></div>`:'')+
+    `<div><b>${mc.life.toFixed(1)}</b><span>${tl('3000 只模拟跳蚤的平均寿命','Average life of 3000 simulated fleas')}</span></div>`;
   let t='';
   if(!esc()){
     const [vb,vs,ve,vj]=vals,gain=x=>((vb/x-1)*100).toFixed(0)+'%';
-    t=`在罐外满血时预期还能活 ${SOL.Vo[HMAX].toFixed(0)} 天；只靠罐内食物最多撑 ${(P.e0+P.F0*P.g)/P.m|0} 天左右的能量。`;
+    t=tl(`在罐外满血时预期还能活 ${SOL.Vo[HMAX].toFixed(0)} 天；只靠罐内食物最多撑 ${(P.e0+P.F0*P.g)/P.m|0} 天左右的能量。`,`At full health, life outside is expected to last ${SOL.Vo[HMAX].toFixed(0)} days; the food in the jar only provides energy for about ${(P.e0+P.F0*P.g)/P.m|0} days. `);
     if(P.sched!=='const'&&vb-vs>=0.05){const vo=vals[4];
-      t+=Math.abs(vb-vo)<0.05?'最优解就是等网开：网关着时吃饭、休息攒能量，网一开就跳。':`最优策略比“只在网开时跳”多活 ${gain(vo)}：等下一次开网的代价太大时，直接硬跳更划算。`;}
-    else if(vb-vs<0.05)t+='在这组条件下跳出去不划算，冒险的代价比外面的好处大。';
-    else if(Math.abs(vb-vj)<0.05)t+='直接全力跳已经是最优：网够稀，越早出去越好。';
-    else if(Math.abs(vb-ve)<0.05)t+='最优解就是先把罐里吃干净再跳：罐内足够安全，没必要提早冒险。';
-    else t+=`最优策略比“永远不跳”多活 ${gain(vs)}，比“一上来就全力跳”多活 ${gain(vj)}。`;
+      t+=Math.abs(vb-vo)<0.05?tl('最优解就是等网开：网关着时吃饭、休息攒能量，网一开就跳。','The best plan is to wait for the net to open: eat and rest while it is closed, and jump as soon as it opens.'):tl(`最优策略比“只在网开时跳”多活 ${gain(vo)}：等下一次开网的代价太大时，直接硬跳更划算。`,`The optimal strategy lives ${gain(vo)} longer than “jump only when open”: when the next opening is too far away, forcing a jump pays off.`);}
+    else if(vb-vs<0.05)t+=tl('在这组条件下跳出去不划算，冒险的代价比外面的好处大。','Here, escaping isn’t worth it: the risk costs more than the outside offers.');
+    else if(Math.abs(vb-vj)<0.05)t+=tl('直接全力跳已经是最优：网够稀，越早出去越好。','Jumping at full strength right away is already optimal: the net is sparse enough, so the earlier the better.');
+    else if(Math.abs(vb-ve)<0.05)t+=tl('最优解就是先把罐里吃干净再跳：罐内足够安全，没必要提早冒险。','The best plan is to finish the food first and then jump: the jar is safe enough that there is no reason to risk it early.');
+    else t+=tl(`最优策略比“永远不跳”多活 ${gain(vs)}，比“一上来就全力跳”多活 ${gain(vj)}。`,`The optimal strategy lives ${gain(vs)} longer than “never jump” and ${gain(vj)} longer than “full jump right away”.`);
   }else{
     const keep=P.obj;P.obj='life';const lifeSol=solve(P.F0,null,NET);P.obj=keep;
     const kl=i0(lifeSol);
-    t=`追求逃出概率时，逃出率 ${(SOL.X[k0]*100).toFixed(1)}%，预期寿命 ${SOL.V[k0].toFixed(1)} 天；如果改为追求活得最久，逃出率是 ${(lifeSol.X[kl]*100).toFixed(1)}%，寿命 ${lifeSol.V[kl].toFixed(1)} 天。`;
+    t=tl(`追求逃出概率时，逃出率 ${(SOL.X[k0]*100).toFixed(1)}%，预期寿命 ${SOL.V[k0].toFixed(1)} 天；如果改为追求活得最久，逃出率是 ${(lifeSol.X[kl]*100).toFixed(1)}%，寿命 ${lifeSol.V[kl].toFixed(1)} 天。`,`Aiming for escape: ${(SOL.X[k0]*100).toFixed(1)}% escape, ${SOL.V[k0].toFixed(1)} days expected life. Aiming for the longest life instead: ${(lifeSol.X[kl]*100).toFixed(1)}% escape, ${lifeSol.V[kl].toFixed(1)} days. `);
     const dv=lifeSol.V[kl]-SOL.V[k0];
-    if(dv>0.5)t+=`多出来的逃出机会是用 ${dv.toFixed(1)} 天寿命换来的。`;
-    else t+='两个目标在这里基本不冲突。';
+    if(dv>0.5)t+=tl(`多出来的逃出机会是用 ${dv.toFixed(1)} 天寿命换来的。`,`The extra escape chance costs ${dv.toFixed(1)} days of life.`);
+    else t+=tl('两个目标在这里基本不冲突。','Here the two goals barely conflict.');
   }
   if(P.sched!=='const'&&mc.esc){
-    t+=` 成功逃出的跳蚤里有 ${pct(mc.escOpen)} 是趁网开着出去的。`;
-    if(NET.blind)t+='跳蚤看不见网，只能按自己推测的“网开着的概率”行动，所以常常白跳。';
+    t+=tl(` 成功逃出的跳蚤里有 ${pct(mc.escOpen)} 是趁网开着出去的。`,` Of the fleas that escape, ${pct(mc.escOpen)} get out while the net is open.`);
+    if(NET.blind)t+=tl('跳蚤看不见网，只能按自己推测的“网开着的概率”行动，所以常常白跳。',' The flea can’t see the net, so it acts on its own estimate of the odds and often jumps in vain.');
   }
   document.getElementById('insight').textContent=t;
   if(NET.n!==prevN||+mapN.value>=NET.n){mapN.max=NET.n-1;mapN.value=NET.init;}
@@ -552,7 +567,7 @@ const cellSize=()=>Math.max(9,Math.min(22,Math.floor(440/(P.F0+1))));
 function drawMap(){
   const svg=document.getElementById('map'),H=+mapH.value,NS=+mapN.value,F=P.F0;
   const cell=cellSize(),L=34,T=8,ch=cell/1.4,w=L+cell*(F+1)+6,hgt=T+EMAX*ch+34;
-  let s=`<svg id="map" role="img" aria-label="策略地图" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${hgt}" width="${w}" height="${hgt}" style="cursor:pointer">`;
+  let s=`<svg id="map" role="img" aria-label="${tl('策略地图','Strategy map')}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${hgt}" width="${w}" height="${hgt}" style="cursor:pointer">`;
   for(let e=1;e<=EMAX;e++)for(let f=0;f<=F;f++){
     const a=SOL.A[SOL.id(e,f,H,NS)];
     s+=`<rect x="${L+f*cell}" y="${T+(EMAX-e)*ch}" width="${cell-1}" height="${ch-1}" fill="var(${ACT[a].c})" data-e="${e}" data-f="${f}"/>`;
@@ -562,14 +577,14 @@ function drawMap(){
   for(let e=5;e<=EMAX;e+=5)s+=`<text x="${L-6}" y="${T+(EMAX-e)*ch+ch*0.75}" text-anchor="end">${e}</text>`;
   const stepF=F>20?10:5;
   for(let f=0;f<=F;f+=stepF)s+=`<text x="${L+f*cell+cell/2}" y="${T+EMAX*ch+14}" text-anchor="middle">${f}</text>`;
-  s+=`<text x="${L+cell*(F+1)/2}" y="${hgt-4}" text-anchor="middle">罐内剩余食物（份）</text>`;
-  s+=`<text x="10" y="${T+EMAX*ch/2}" text-anchor="middle" transform="rotate(-90 10 ${T+EMAX*ch/2})">能量</text></svg>`;
+  s+=`<text x="${L+cell*(F+1)/2}" y="${hgt-4}" text-anchor="middle">${tl('罐内剩余食物（份）','Food left in jar')}</text>`;
+  s+=`<text x="10" y="${T+EMAX*ch/2}" text-anchor="middle" transform="rotate(-90 10 ${T+EMAX*ch/2})">${tl('能量','Energy')}</text></svg>`;
   svg.outerHTML=s;
   const ns=document.getElementById('map');
   ns.addEventListener('mousemove',ev=>{
     const r=ev.target.closest('rect[data-e]');if(!r){tip.hidden=true;return;}
     const e=+r.dataset.e,f=+r.dataset.f,i=SOL.id(e,f,H,NS);
-    tip.textContent=`能量 ${e} · 食物 ${f} · 健康 ${H}${P.sched!=='const'?'\n'+NET.label(NS):''}\n最优：${ACT[SOL.A[i]].n}\n预期寿命 ${SOL.V[i].toFixed(1)} 天\n逃出概率 ${(SOL.X[i]*100).toFixed(0)}%`;
+    tip.textContent=tl(`能量 ${e} · 食物 ${f} · 健康 ${H}${P.sched!=='const'?'\n'+NET.label(NS):''}\n最优：${ACT[SOL.A[i]].n}\n预期寿命 ${SOL.V[i].toFixed(1)} 天\n逃出概率 ${(SOL.X[i]*100).toFixed(0)}%`,`Energy ${e} · Food ${f} · Health ${H}${P.sched!=='const'?'\n'+NET.label(NS):''}\nBest: ${ACT[SOL.A[i]].n}\nExpected life ${SOL.V[i].toFixed(1)} days\nEscape chance ${(SOL.X[i]*100).toFixed(0)}%`);
     tip.hidden=false;tip.style.left=Math.min(innerWidth-220,ev.clientX+14)+'px';tip.style.top=(ev.clientY+14)+'px';
   });
   ns.addEventListener('mouseleave',()=>tip.hidden=true);
@@ -599,7 +614,7 @@ function renderBell(){
   const sym=E?'X':'V',one=E?'0':'1';
   const nl=k=>P.sched==='const'?'':'·'+NET.short(k);
   const val=(e2,f2,h2,k)=>(e2<=0||h2<=0)?0:arr[o.id(e2,f2,h2,k)];
-  const ref=(e2,f2,h2,k)=>h2<=0?'<span class="dead">死亡</span>':e2<=0?'<span class="dead">饿死</span>':`<button class="ref" data-e="${e2}" data-f="${f2}" data-h="${h2}" data-n="${k}">${sym}(能${e2}·粮${f2}·血${h2}${nl(k)})</button>`;
+  const ref=(e2,f2,h2,k)=>h2<=0?tl('<span class="dead">死亡</span>','<span class="dead">dead</span>'):e2<=0?tl('<span class="dead">饿死</span>','<span class="dead">starved</span>'):`<button class="ref" data-e="${e2}" data-f="${f2}" data-h="${h2}" data-n="${k}">${sym}(${tl('能','E')}${e2}·${tl('粮','F')}${f2}·${tl('血','H')}${h2}${nl(k)})</button>`;
   // expectation over tomorrow's net state
   const ex=(e2,f2,h2,lst)=>{
     const v=lst.reduce((s,[p,k])=>s+p*val(e2,f2,h2,k),0);
@@ -609,33 +624,33 @@ function renderBell(){
   const q=Math.min(1,hz(h)+P.rin),s=1-q,S=s.toFixed(3),r=P.r,t0=NET.tr(n,0);
   const rows=[];
   if(f>0){const e2=Math.min(EMAX,e-P.m+P.g),X=ex(e2,f-1,h,t0);
-    rows.push({a:0,eq:`${one} + ${S} × ${X.t}`,num:`${one} + ${S} × ${fx(X.v)}`,v:(E?0:1)+s*X.v,why:`能量 ${e}−${P.m}+${P.g}${e-P.m+P.g>EMAX?'（满了，多的浪费）':''}，食物 −1`});}
-  else rows.push({a:0,na:'罐里没有食物了'});
+    rows.push({a:0,eq:`${one} + ${S} × ${X.t}`,num:`${one} + ${S} × ${fx(X.v)}`,v:(E?0:1)+s*X.v,why:tl(`能量 ${e}−${P.m}+${P.g}${e-P.m+P.g>EMAX?'（满了，多的浪费）':''}，食物 −1`,`energy ${e}−${P.m}+${P.g}${e-P.m+P.g>EMAX?' (full, the rest is wasted)':''}, food −1`)});}
+  else rows.push({a:0,na:tl('罐里没有食物了','no food left in the jar')});
   {const e2=e-P.m,h2=Math.min(HMAX,h+1),A=ex(e2,f,h,t0);
-    if(h===HMAX||r===0||e2<=0)rows.push({a:1,eq:`${one} + ${S} × ${A.t}`,num:`${one} + ${S} × ${fx(A.v)}`,v:(E?0:1)+s*A.v,why:`能量 −${P.m}${h===HMAX?'，已满血':''}`});
+    if(h===HMAX||r===0||e2<=0)rows.push({a:1,eq:`${one} + ${S} × ${A.t}`,num:`${one} + ${S} × ${fx(A.v)}`,v:(E?0:1)+s*A.v,why:tl(`能量 −${P.m}${h===HMAX?'，已满血':''}`,`energy −${P.m}${h===HMAX?', already at full health':''}`)});
     else{const B=ex(e2,f,h2,t0);rows.push({a:1,eq:`${one} + ${S} × [ ${r.toFixed(2)} × ${B.t} + ${(1-r).toFixed(2)} × ${A.t} ]`,
-      num:`${one} + ${S} × [ ${r.toFixed(2)} × ${fx(B.v)} + ${(1-r).toFixed(2)} × ${fx(A.v)} ]`,v:(E?0:1)+s*(r*B.v+(1-r)*A.v),why:`能量 −${P.m}，${pct(r)} 概率回 1 点血`});}}
+      num:`${one} + ${S} × [ ${r.toFixed(2)} × ${fx(B.v)} + ${(1-r).toFixed(2)} × ${fx(A.v)} ]`,v:(E?0:1)+s*(r*B.v+(1-r)*A.v),why:tl(`能量 −${P.m}，${pct(r)} 概率回 1 点血`,`energy −${P.m}, ${pct(r)} chance to heal 1`)});}}
   for(let j=1;j<=3;j++){
     const cost=P.m+P.jc*j,e2=e-cost;
-    if(e2<0){rows.push({a:j+1,na:`能量不够（需要 ${cost}，现在 ${e}）`});continue;}
+    if(e2<0){rows.push({a:j+1,na:tl(`能量不够（需要 ${cost}，现在 ${e}）`,`not enough energy (needs ${cost}, has ${e})`)});continue;}
     const p=NET.pp(n,j),h2=h-dmgA(j),out=E?1:o.Vo[h],B=ex(e2,f,h2,NET.tr(n,j));
-    rows.push({a:j+1,eq:`${one} + ${S} × [ ${p.toFixed(2)} × ${E?'1（逃出）':`罐外(血${h})`} + ${(1-p).toFixed(2)} × ${B.t} ]`,
+    rows.push({a:j+1,eq:`${one} + ${S} × [ ${p.toFixed(2)} × ${E?tl('1（逃出）','1 (escaped)'):tl(`罐外(血${h})`,`outside(H${h})`)} + ${(1-p).toFixed(2)} × ${B.t} ]`,
       num:`${one} + ${S} × [ ${p.toFixed(2)} × ${fx(out)} + ${(1-p).toFixed(2)} × ${fx(B.v)} ]`,v:(E?0:1)+s*(p*out+(1-p)*B.v),
-      why:`能量 −${cost}；穿网 ${pct(p)}，撞网 −${dmgA(j)} 血`});
+      why:tl(`能量 −${cost}；穿网 ${pct(p)}，撞网 −${dmgA(j)} 血`,`energy −${cost}; pass ${pct(p)}, a hit costs ${dmgA(j)} health`)});
   }
   const best=o.A[o.id(e,f,h,n)];
   document.getElementById('bellIntro').textContent=E?
-    '目标是逃出概率时：一个处境的价值 X = 活过今天的概率 × 明天各种可能结果的 X（按概率加权）；跳出去记为 1，死在罐里记为 0。每个动作算一遍，取最大的那个。':
-    '一个处境的价值 V = 今天活下来的 1 天 + 活过今天的概率 × 明天各种可能结果的价值（按概率加权）。每个动作算一遍，取最大的那个。';
-  document.getElementById('bellState').innerHTML=`<span>处境：能量 <b>${e}</b> · 罐内食物 <b>${f}</b> · 健康 <b>${h}</b></span>`+
+    tl('目标是逃出概率时：一个处境的价值 X = 活过今天的概率 × 明天各种可能结果的 X（按概率加权）；跳出去记为 1，死在罐里记为 0。每个动作算一遍，取最大的那个。','With escape as the goal, the value X of a situation = the chance of surviving today × the probability-weighted X of tomorrow’s outcomes; getting out counts as 1, dying in the jar as 0. Compute it for every action and take the largest.'):
+    tl('一个处境的价值 V = 今天活下来的 1 天 + 活过今天的概率 × 明天各种可能结果的价值（按概率加权）。每个动作算一遍，取最大的那个。','The value V of a situation = 1 day lived today + the chance of surviving today × the probability-weighted value of tomorrow’s outcomes. Compute it for every action and take the largest.');
+  document.getElementById('bellState').innerHTML=tl(`<span>处境：能量 <b>${e}</b> · 罐内食物 <b>${f}</b> · 健康 <b>${h}</b></span>`,`<span>Situation: energy <b>${e}</b> · food <b>${f}</b> · health <b>${h}</b></span>`)+
     (P.sched!=='const'?`<span>${NET.label(n)}</span>`:'')+
-    `<span>今天活下来的概率 = 1 − (${(P.h0*100).toFixed(1)}% + ${(P.k*100).toFixed(1)}%×${HMAX-h} + ${(P.rin*100).toFixed(1)}%) = <b>${S}</b></span>`+
-    (E?'':`<span>罐外(血${h}) = 跳出去后的预期寿命 <b>${o.Vo[h].toFixed(1)}</b> 天</span>`);
-  document.getElementById('bell').innerHTML=`<tr><th>动作</th><th>方程</th><th>代入数字</th><th style="text-align:right">${E?'逃出概率':'预期寿命'}</th></tr>`+
+    `<span>${tl('今天活下来的概率','Chance of surviving today')} = 1 − (${(P.h0*100).toFixed(1)}% + ${(P.k*100).toFixed(1)}%×${HMAX-h} + ${(P.rin*100).toFixed(1)}%) = <b>${S}</b></span>`+
+    (E?'':tl(`<span>罐外(血${h}) = 跳出去后的预期寿命 <b>${o.Vo[h].toFixed(1)}</b> 天</span>`,`<span>outside(H${h}) = expected life after escaping, <b>${o.Vo[h].toFixed(1)}</b> days</span>`));
+  document.getElementById('bell').innerHTML=`<tr><th>${tl('动作','Action')}</th><th>${tl('方程','Equation')}</th><th>${tl('代入数字','With numbers')}</th><th style="text-align:right">${E?tl('逃出概率','Escape chance'):tl('预期寿命','Expected life')}</th></tr>`+
     rows.map(x=>{const A=ACT[x.a];
-      if(x.na)return `<tr class="na"><td><i class="act" style="background:var(${A.c})"></i>${A.n}</td><td colspan="3">不可选：${x.na}</td></tr>`;
+      if(x.na)return `<tr class="na"><td><i class="act" style="background:var(${A.c})"></i>${A.n}</td><td colspan="3">${tl('不可选：','Not available: ')}${x.na}</td></tr>`;
       const isB=x.a===best;
-      return `<tr class="${isB?'best':''}"><td style="white-space:nowrap"><i class="act" style="background:var(${A.c})"></i>${A.n}${isB?`<span class="chip" style="background:var(--amber)">最优</span>`:''}<div class="note" style="margin:2px 0 0;font-size:11.5px">${x.why}</div></td><td class="m">${x.eq}</td><td class="m">${x.num}</td><td class="v">${E?(x.v*100).toFixed(1)+'%':x.v.toFixed(1)+' 天'}</td></tr>`;}).join('');
+      return `<tr class="${isB?'best':''}"><td style="white-space:nowrap"><i class="act" style="background:var(${A.c})"></i>${A.n}${isB?`<span class="chip" style="background:var(--amber)">${tl('最优','best')}</span>`:''}<div class="note" style="margin:2px 0 0;font-size:11.5px">${x.why}</div></td><td class="m">${x.eq}</td><td class="m">${x.num}</td><td class="v">${E?(x.v*100).toFixed(1)+'%':x.v.toFixed(1)+tl(' 天',' days')}</td></tr>`;}).join('');
   markSel();
 }
 document.getElementById('bell').addEventListener('click',ev=>{
@@ -662,11 +677,11 @@ function drawSweep(pts){
   const W=480,H=260,L=40,R=40,T=14,B=34,iw=W-L-R,ih=H-T-B;
   const ymax=Math.max(...pts.map(p=>Math.max(p.b,p.s,p.j)))*1.08,nice=ymax>100?50:ymax>40?20:10,top=Math.ceil(ymax/nice)*nice;
   const X=d=>L+d/0.95*iw,Y=v=>T+ih-(v/top)*ih,Y2=p=>T+ih-p*ih;
-  let s=`<svg id="sweep" role="img" aria-label="网密度扫描图" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">`;
+  let s=`<svg id="sweep" role="img" aria-label="${tl('网密度扫描图','Net density sweep')}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">`;
   for(let v=0;v<=top;v+=nice)s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${v}</text>`;
   for(let p=0;p<=1;p+=0.5)s+=`<text x="${W-R+6}" y="${Y2(p)+3}">${p*100}%</text>`;
   for(let d=0;d<=0.9;d+=0.3)s+=`<text x="${X(d)}" y="${H-18}" text-anchor="middle">${Math.round(d*100)}%</text>`;
-  s+=`<text x="${L+iw/2}" y="${H-3}" text-anchor="middle">网密度（关着时）</text><text x="${L}" y="${T-4}" text-anchor="start">天</text>`;
+  s+=`<text x="${L+iw/2}" y="${H-3}" text-anchor="middle">${tl('网密度（关着时）','Net density (closed)')}</text><text x="${L}" y="${T-4}" text-anchor="start">${tl('天','days')}</text>`;
   s+=`<line x1="${X(keep)}" x2="${X(keep)}" y1="${T}" y2="${T+ih}" stroke="var(--amber)" stroke-dasharray="2 3"/>`;
   const path=(f,y)=>pts.map((p,i)=>(i?'L':'M')+X(p.d).toFixed(1)+' '+y(f(p)).toFixed(1)).join('');
   s+=`<path d="${path(p=>p.s,Y)}" fill="none" stroke="var(--a-rest)" stroke-width="2"/>`;
@@ -676,7 +691,7 @@ function drawSweep(pts){
   const cp=pts.reduce((a,p)=>Math.abs(p.d-keep)<Math.abs(a.d-keep)?p:a);
   s+=`<circle cx="${X(cp.d)}" cy="${Y(cp.b)}" r="4" fill="var(--amber)"/></svg>`;
   document.getElementById('sweep').outerHTML=s;
-  document.getElementById('legend2').innerHTML=`<span><i style="background:var(--amber)"></i>最优策略（当前目标）的寿命</span><span><i style="background:var(--a-rest)"></i>永远不跳</span><span><i style="background:var(--a-j1)"></i>一上来就全力跳</span><span><i style="background:var(--danger)"></i>逃出概率（右轴）</span>`;
+  document.getElementById('legend2').innerHTML=`<span><i style="background:var(--amber)"></i>${tl('最优策略（当前目标）的寿命','Optimal strategy (current goal), lifespan')}</span><span><i style="background:var(--a-rest)"></i>${tl('永远不跳','Never jump')}</span><span><i style="background:var(--a-j1)"></i>${tl('一上来就全力跳','Full jump right away')}</span><span><i style="background:var(--danger)"></i>${tl('逃出概率（右轴）','Escape chance (right axis)')}</span>`;
 }
 
 // ---------- jailer vs flea ----------
@@ -684,20 +699,20 @@ let jailJob=0;
 async function runJail(){
   const my=++jailJob,keep={...P},el=document.getElementById('jail');
   const tau=keep.tau,Tof=L=>Math.max(L+1,Math.round(L/tau));
-  document.getElementById('jailIntro').innerHTML=`看守者每隔一段时间必须开网（喂食、清洁、透气），开网的天数平均要占 <b>${pct(tau)}</b>，开网时网密度变成 <b>${keep.dOpen===0?'没网':pct(keep.dOpen)}</b>，关着时是 <b>${pct(keep.d)}</b>。看守者能决定什么时候开、一次开多久、让不让跳蚤看见。跳蚤知道看守者的规律，用“逃出概率最高”的策略应对。下面按跳蚤能做到的最好成绩从低到高排，第一名就是看守者的最优安排。比例、密度和跳蚤的条件都沿用上面的设置。`;
-  el.innerHTML='<p class="note">计算中…</p>';
+  document.getElementById('jailIntro').innerHTML=EN?`The jailer must open the net from time to time (feeding, cleaning, airing); open days must average <b>${pct(tau)}</b>. When open, the net density becomes <b>${keep.dOpen===0?'no net':pct(keep.dOpen)}</b>; when closed it is <b>${pct(keep.d)}</b>. The jailer decides when to open, for how long, and whether the flea can see it. The flea knows the jailer’s pattern and plays for the best escape odds. Patterns are ranked by the flea’s best possible result, lowest first, so the top one is the jailer’s best. Ratios, densities and flea settings come from above.`:`看守者每隔一段时间必须开网（喂食、清洁、透气），开网的天数平均要占 <b>${pct(tau)}</b>，开网时网密度变成 <b>${keep.dOpen===0?'没网':pct(keep.dOpen)}</b>，关着时是 <b>${pct(keep.d)}</b>。看守者能决定什么时候开、一次开多久、让不让跳蚤看见。跳蚤知道看守者的规律，用“逃出概率最高”的策略应对。下面按跳蚤能做到的最好成绩从低到高排，第一名就是看守者的最优安排。比例、密度和跳蚤的条件都沿用上面的设置。`;
+  el.innerHTML=tl('<p class="note">计算中…</p>','<p class="note">Computing…</p>');
   const C=[
-    {n:'永远关着',sub:'不满足开网要求，仅作参照',o:{sched:'const'},ref:true},
-    {n:'定时开 1 天，第一次尽量晚',o:{sched:'periodic',L:1,off:Tof(1)-1}},
-    {n:'定时开 1 天，第一天就开',o:{sched:'periodic',L:1,off:0}},
-    {n:'定时开 3 天，第一次尽量晚',o:{sched:'periodic',L:3,off:Tof(3)-3}},
-    {n:'定时开 6 天，第一次尽量晚',o:{sched:'periodic',L:6,off:Tof(6)-6}},
-    {n:'随机开，跳蚤看得见',o:{sched:'random',vis:'yes'},pair:'r'},
-    {n:'随机开，跳蚤看不见',o:{sched:'random',vis:'no'},pair:'r',blind:1},
-    {n:'成团开（平均 3 天），看得见',o:{sched:'burst',L:3,vis:'yes'},pair:'b3'},
-    {n:'成团开（平均 3 天），看不见',o:{sched:'burst',L:3,vis:'no'},pair:'b3',blind:1},
-    {n:'成团开（平均 6 天），看得见',o:{sched:'burst',L:6,vis:'yes'},pair:'b6'},
-    {n:'成团开（平均 6 天），看不见',o:{sched:'burst',L:6,vis:'no'},pair:'b6',blind:1},
+    {n:tl('永远关着','Always closed'),sub:tl('不满足开网要求，仅作参照','Breaks the opening rule; reference only'),o:{sched:'const'},ref:true},
+    {n:tl('定时开 1 天，第一次尽量晚','Scheduled, 1 day, first one as late as possible'),o:{sched:'periodic',L:1,off:Tof(1)-1}},
+    {n:tl('定时开 1 天，第一天就开','Scheduled, 1 day, first one on day 0'),o:{sched:'periodic',L:1,off:0}},
+    {n:tl('定时开 3 天，第一次尽量晚','Scheduled, 3 days, first one as late as possible'),o:{sched:'periodic',L:3,off:Tof(3)-3}},
+    {n:tl('定时开 6 天，第一次尽量晚','Scheduled, 6 days, first one as late as possible'),o:{sched:'periodic',L:6,off:Tof(6)-6}},
+    {n:tl('随机开，跳蚤看得见','Random, flea can see'),o:{sched:'random',vis:'yes'},pair:'r'},
+    {n:tl('随机开，跳蚤看不见','Random, flea can’t see'),o:{sched:'random',vis:'no'},pair:'r',blind:1},
+    {n:tl('成团开（平均 3 天），看得见','Bursts (avg. 3 days), can see'),o:{sched:'burst',L:3,vis:'yes'},pair:'b3'},
+    {n:tl('成团开（平均 3 天），看不见','Bursts (avg. 3 days), can’t see'),o:{sched:'burst',L:3,vis:'no'},pair:'b3',blind:1},
+    {n:tl('成团开（平均 6 天），看得见','Bursts (avg. 6 days), can see'),o:{sched:'burst',L:6,vis:'yes'},pair:'b6'},
+    {n:tl('成团开（平均 6 天），看不见','Bursts (avg. 6 days), can’t see'),o:{sched:'burst',L:6,vis:'no'},pair:'b6',blind:1},
   ];
   const res=[];
   for(const c of C){
@@ -710,17 +725,17 @@ async function runJail(){
   const ref=res.find(r=>r.ref),rest=res.filter(r=>!r.ref).sort((a,b)=>a.x-b.x),mx=Math.max(...res.map(r=>r.x),1e-9);
   const lo=rest[0].x,nTie=rest.filter(r=>r.x-lo<5e-4).length,tied=Math.max(...res.map(r=>r.x))-Math.min(...res.map(r=>r.x))<2e-3;
   const isBest=r=>!r.ref&&!tied&&r.x-lo<5e-4;
-  const row=(r,i)=>`<div class="jr ${isBest(r)?'best':''} ${r.ref?'ref':''}"><div class="jt"><span>${r.n}${isBest(r)?`<span class="chip">${nTie>1?'并列最优':'看守者最优'}</span>`:''}</span><b>${(r.x*100).toFixed(1)}%</b></div><div class="tr"><i style="width:${(r.x/mx*100).toFixed(1)}%"></i></div><div class="js">${r.ref?r.sub:`跳蚤应对：${r.mc.esc?`${pct(r.mc.escOpen)} 的逃出发生在网开时，平均第 ${r.mc.escDay.toFixed(0)} 天出去`:'几乎逃不出'}${r.first!==undefined?`；第一次开网在第 ${r.first} 天`:''}`}</div></div>`;
+  const row=(r,i)=>`<div class="jr ${isBest(r)?'best':''} ${r.ref?'ref':''}"><div class="jt"><span>${r.n}${isBest(r)?`<span class="chip">${nTie>1?tl('并列最优','tied best'):tl('看守者最优','jailer’s best')}</span>`:''}</span><b>${(r.x*100).toFixed(1)}%</b></div><div class="tr"><i style="width:${(r.x/mx*100).toFixed(1)}%"></i></div><div class="js">${r.ref?r.sub:tl(`跳蚤应对：${r.mc.esc?`${pct(r.mc.escOpen)} 的逃出发生在网开时，平均第 ${r.mc.escDay.toFixed(0)} 天出去`:'几乎逃不出'}${r.first!==undefined?`；第一次开网在第 ${r.first} 天`:''}`,`Flea’s response: ${r.mc.esc?`${pct(r.mc.escOpen)} of escapes happen while the net is open, on day ${r.mc.escDay.toFixed(0)} on average`:'almost never escapes'}${r.first!==undefined?`; first opening on day ${r.first}`:''}`)}</div></div>`;
   el.innerHTML=rest.map(row).join('')+row(ref,-1);
   const best=rest[0],worst=rest[rest.length-1];
   const pairs=['r','b3','b6'].map(p=>{const v=res.find(r=>r.pair===p&&!r.blind),b=res.find(r=>r.pair===p&&r.blind);return v.x-b.x;});
   const blindGain=pairs.reduce((a,b)=>a+b,0)/pairs.length;
-  const early=res.find(r=>r.n.includes('第一天就开')),late=res.find(r=>r.n==='定时开 1 天，第一次尽量晚');
-  if(tied){P=keep;document.getElementById('jailNote').textContent=`所有安排的结果都一样（${(lo*100).toFixed(1)}%），因为关着的网已经拦不住跳蚤：网关着时全力跳的穿网率就有 ${pct(passD(keep.d,3))}，跳蚤第 1 天就会跳出去，根本用不上开网的机会，看守者怎么安排都没用。这个上限也不是 100%，因为每天先结算自然死亡，跳蚤有 ${((keep.h0+keep.rin)*100).toFixed(1)}%（基础死亡率 + 罐内风险）的概率在第 1 天跳之前就死了。把网密度调到 70% 以上，不同安排的差别才会出现。`;return;}
-  let t=`在同样的开网时间下，看守者最好的安排是「${best.n}」，跳蚤最多只有 ${(best.x*100).toFixed(1)}% 的机会逃出；最差的是「${worst.n}」，跳蚤能逃出 ${(worst.x*100).toFixed(1)}%。`;
-  t+=`让跳蚤看不见网开没开，平均能把逃出概率压低 ${(blindGain*100).toFixed(1)} 个百分点。`;
-  t+=`同样是定时开 1 天，第一次开网放在第 ${late.first} 天比第 0 天少让 ${((early.x-late.x)*100).toFixed(1)} 个百分点的跳蚤逃走。`;
-  t+=best.x-ref.x<5e-4?`最优安排的效果已经和永远关着（${(ref.x*100).toFixed(1)}%）一样：开网被推迟到跳蚤撑不到的时候，等于没开。`:`即使是最优安排，也比永远关着（${(ref.x*100).toFixed(1)}%）多给了跳蚤 ${((best.x-ref.x)*100).toFixed(1)} 个百分点。`;
+  const early=res.find(r=>r.o.sched==='periodic'&&r.o.L===1&&r.o.off===0),late=res.find(r=>r.o.sched==='periodic'&&r.o.L===1&&r.o.off!==0);
+  if(tied){P=keep;document.getElementById('jailNote').textContent=EN?`All patterns give the same result (${(lo*100).toFixed(1)}%), because the closed net can no longer stop the flea: a full jump already gets through ${pct(passD(keep.d,3))} of the time, so the flea leaves on day 1 and never needs an opening. The ceiling is not 100% because natural death is settled first each day: the flea has a ${((keep.h0+keep.rin)*100).toFixed(1)}% chance (base death rate + risk inside) of dying on day 1 before it jumps. Set the net density above 70% to see the patterns differ.`:`所有安排的结果都一样（${(lo*100).toFixed(1)}%），因为关着的网已经拦不住跳蚤：网关着时全力跳的穿网率就有 ${pct(passD(keep.d,3))}，跳蚤第 1 天就会跳出去，根本用不上开网的机会，看守者怎么安排都没用。这个上限也不是 100%，因为每天先结算自然死亡，跳蚤有 ${((keep.h0+keep.rin)*100).toFixed(1)}%（基础死亡率 + 罐内风险）的概率在第 1 天跳之前就死了。把网密度调到 70% 以上，不同安排的差别才会出现。`;return;}
+  let t=tl(`在同样的开网时间下，看守者最好的安排是「${best.n}」，跳蚤最多只有 ${(best.x*100).toFixed(1)}% 的机会逃出；最差的是「${worst.n}」，跳蚤能逃出 ${(worst.x*100).toFixed(1)}%。`,`With the same amount of open time, the jailer’s best pattern is “${best.n}”: the flea escapes at most ${(best.x*100).toFixed(1)}% of the time. The worst is “${worst.n}”, with ${(worst.x*100).toFixed(1)}% escaping. `);
+  t+=tl(`让跳蚤看不见网开没开，平均能把逃出概率压低 ${(blindGain*100).toFixed(1)} 个百分点。`,`Hiding whether the net is open lowers the escape odds by ${(blindGain*100).toFixed(1)} percentage points on average. `);
+  t+=tl(`同样是定时开 1 天，第一次开网放在第 ${late.first} 天比第 0 天少让 ${((early.x-late.x)*100).toFixed(1)} 个百分点的跳蚤逃走。`,`For a scheduled 1-day opening, putting the first one on day ${late.first} instead of day 0 lets ${((early.x-late.x)*100).toFixed(1)} percentage points fewer fleas escape. `);
+  t+=best.x-ref.x<5e-4?tl(`最优安排的效果已经和永远关着（${(ref.x*100).toFixed(1)}%）一样：开网被推迟到跳蚤撑不到的时候，等于没开。`,`The best pattern already matches never opening (${(ref.x*100).toFixed(1)}%): the opening comes after the flea can no longer hold out, so it might as well not happen.`):tl(`即使是最优安排，也比永远关着（${(ref.x*100).toFixed(1)}%）多给了跳蚤 ${((best.x-ref.x)*100).toFixed(1)} 个百分点。`,`Even the best pattern gives the flea ${((best.x-ref.x)*100).toFixed(1)} percentage points more than never opening (${(ref.x*100).toFixed(1)}%).`);
   document.getElementById('jailNote').textContent=t;
 }
 
@@ -793,15 +808,15 @@ function learnMC(pol,n){
 }
 let LS=null,LDEMO=null,learnJob=0;
 const LTYPES=[
-  {key:'A',n:'A · 学习型，认为网永远不会变'},
-  {key:'B',n:'B · 学习型，认为网可能被拿走'},
-  {key:'C',n:'C · 偶尔试探：A 的做法，再加上每 7 天轻跳一次'},
-  {key:'D',n:'D · 撞 2 次就放弃'},
-  {key:'E',n:'E · 全知：知道网的真实密度和哪天被拿走',ref:true},
+  {key:'A',n:tl('A · 学习型，认为网永远不会变','A · Learner, believes the net never changes')},
+  {key:'B',n:tl('B · 学习型，认为网可能被拿走','B · Learner, believes the net may be removed')},
+  {key:'C',n:tl('C · 偶尔试探：A 的做法，再加上每 7 天轻跳一次','C · Prober: A’s policy plus a light jump every 7 days')},
+  {key:'D',n:tl('D · 撞 2 次就放弃','D · Gives up after 2 hits')},
+  {key:'E',n:tl('E · 全知：知道网的真实密度和哪天被拿走','E · All-knowing: knows the true density and the removal day'),ref:true},
 ];
 async function runLearn(){
   const my=++learnJob;await tick();if(my!==learnJob)return;
-  document.getElementById('lhRows').innerHTML='<p class="note">计算中…</p>';
+  document.getElementById('lhRows').innerHTML=tl('<p class="note">计算中…</p>','<p class="note">Computing…</p>');
   await tick();if(my!==learnJob)return;
   const LA=solveLearn(0,0);
   await tick();if(my!==learnJob)return;
@@ -826,25 +841,25 @@ function renderLearn(res,LA,LB){
   const T=P.lhT,f2=Math.floor(P.F0/2);
   const fmtT=x=>isNaN(x)?'—':pct(x);
   document.getElementById('lhRows').innerHTML=LTYPES.map(t=>{const r=res[t.key];
-    const name=t.key==='B'?`B · 学习型，认为网每天有 ${(P.lhQ*100).toFixed(1)}% 可能被拿走`:t.n;
-    return `<div class="jr ${t.ref?'ref':''}"><div class="jt"><span>${name}</span><b>${fmtT(r.trap)}</b></div><div class="tr"><i style="width:${isNaN(r.trap)?0:(r.trap*100).toFixed(1)}%;background:var(--danger)"></i></div><div class="js">网被拿走那天还在罐里的跳蚤中困死的比例 · 最终逃出 ${pct(r.esc)} · 平均撞网 ${r.hits.toFixed(1)} 次${r.last?` · 最后一次跳平均在第 ${r.last.toFixed(0)} 天`:''}</div></div>`;}).join('');
+    const name=t.key==='B'?tl(`B · 学习型，认为网每天有 ${(P.lhQ*100).toFixed(1)}% 可能被拿走`,`B · Learner, believes a ${(P.lhQ*100).toFixed(1)}% daily chance the net is removed`):t.n;
+    return `<div class="jr ${t.ref?'ref':''}"><div class="jt"><span>${name}</span><b>${fmtT(r.trap)}</b></div><div class="tr"><i style="width:${isNaN(r.trap)?0:(r.trap*100).toFixed(1)}%;background:var(--danger)"></i></div><div class="js">${tl(`网被拿走那天还在罐里的跳蚤中困死的比例 · 最终逃出 ${pct(r.esc)} · 平均撞网 ${r.hits.toFixed(1)} 次${r.last?` · 最后一次跳平均在第 ${r.last.toFixed(0)} 天`:''}`,`Trapped, among fleas still inside on removal day · escaped ${pct(r.esc)} · ${r.hits.toFixed(1)} hits on average${r.last?` · last jump on day ${r.last.toFixed(0)} on average`:''}`)}</div></div>`;}).join('');
   // chart 1: estimated pass rate vs accumulated failures, and whether A still jumps
   const p1=[];let kStar=null;
   for(let k=0;k<=KMAX;k++){const on=LA.A[LA.id(EMAX,f2,HMAX,k,0)]>=2;p1.push({x:k,y:LA.pp(k,0,3),on});if(!on&&kStar===null)kStar=k;}
-  bandChart('lhC1',p1,KMAX,'累计撞网力度（全力跳一次记 3）',kStar);
+  bandChart('lhC1',p1,KMAX,tl('累计撞网力度（全力跳一次记 3）','Accumulated hit strength (a full jump counts 3)'),kStar);
   const kB=kStar===null?KMAX:kStar,p2=[];let wStar=null;
   for(let w=0;w<=WMAX;w++){const on=LB.A[LB.id(EMAX,f2,HMAX,kB,Math.min(LB.W,w))]>=2;p2.push({x:w,y:LB.pp(kB,w,3),on});if(on&&wStar===null&&w>0)wStar=w;}
-  bandChart('lhC2',p2,WMAX,'上次撞网后过了多少天',wStar);
-  document.getElementById('lhC2t').textContent=`B 撞网累计力度到 ${kB} 之后：隔得越久，越相信网可能已经没了`;
+  bandChart('lhC2',p2,WMAX,tl('上次撞网后过了多少天','Days since the last hit'),wStar);
+  document.getElementById('lhC2t').textContent=tl(`B 撞网累计力度到 ${kB} 之后：隔得越久，越相信网可能已经没了`,`B, after accumulated hit strength ${kB}: the longer it waits, the more it believes the net may be gone`);
   const A=res.A,B=res.B,C=res.C,D=res.D,E=res.E;
   let t='';
-  if(kStar===0)t+=`在这组条件下，学习型跳蚤一开始就觉得不值得跳（先验以为网有 ${pct(P.lhMu)} 密，撞网又疼），所以根本没有“撞出来的无助”。`;
-  else if(kStar===null)t+='在这组条件下，学习型跳蚤撞再多次也不会彻底放弃，所以不会出现习得性无助。可以把网调密、把撞网伤害调高试试。';
-  else t+=`学习型跳蚤 A 撞网累计力度到 ${kStar}（大约 ${Math.ceil(kStar/3)} 次全力跳）后，估计的全力跳穿网率降到 ${pct(LA.pp(kStar,0,3))}，在罐里还剩一半食物时就不再跳了：再撞一次的伤会让以后每天都更容易死，它宁愿先把存粮吃完再说，可很多跳蚤等不到那天就老死在罐里。`;
-  if(!isNaN(A.trap))t+=` 网在第 ${T} 天被拿走时还在罐里的跳蚤中，A 有 ${pct(A.trap)} 再也没出去，`+
-    `会偶尔试探的 C 只有 ${fmtT(C.trap)}，撞 2 次就放弃的 D 有 ${fmtT(D.trap)}，认为网可能被拿走的 B 有 ${fmtT(B.trap)}，全知的 E 是 ${fmtT(E.trap)}。`;
-  else t+=` 在第 ${T} 天之前，跳蚤都已经出去或死了，网被拿走这件事没有影响。把“网被拿走的日子”调早一些试试。`;
-  if(P.lhQ>0&&wStar!==null&&kStar)t+=` B 放弃后过 ${wStar} 天，会觉得网可能已经没了，再试一次。`;
+  if(kStar===0)t+=tl(`在这组条件下，学习型跳蚤一开始就觉得不值得跳（先验以为网有 ${pct(P.lhMu)} 密，撞网又疼），所以根本没有“撞出来的无助”。`,`Under these settings the learning flea thinks jumping isn’t worth it from the start (it guesses the net is ${pct(P.lhMu)} dense, and hits hurt), so there is no learned helplessness here. `);
+  else if(kStar===null)t+=tl('在这组条件下，学习型跳蚤撞再多次也不会彻底放弃，所以不会出现习得性无助。可以把网调密、把撞网伤害调高试试。','Under these settings the learning flea never fully gives up, however often it hits, so no learned helplessness appears. Try a denser net or more damage. ');
+  else t+=tl(`学习型跳蚤 A 撞网累计力度到 ${kStar}（大约 ${Math.ceil(kStar/3)} 次全力跳）后，估计的全力跳穿网率降到 ${pct(LA.pp(kStar,0,3))}，在罐里还剩一半食物时就不再跳了：再撞一次的伤会让以后每天都更容易死，它宁愿先把存粮吃完再说，可很多跳蚤等不到那天就老死在罐里。`,`Once learning flea A’s accumulated hit strength reaches ${kStar} (about ${Math.ceil(kStar/3)} full jumps), its estimated full-jump pass rate has fallen to ${pct(LA.pp(kStar,0,3))}, and with half its food left it stops jumping. Another injury would make every later day deadlier, so it prefers to eat its stock first, but many fleas die of old age before that day comes. `);
+  if(!isNaN(A.trap))t+=tl(` 网在第 ${T} 天被拿走时还在罐里的跳蚤中，A 有 ${pct(A.trap)} 再也没出去，`+
+    `会偶尔试探的 C 只有 ${fmtT(C.trap)}，撞 2 次就放弃的 D 有 ${fmtT(D.trap)}，认为网可能被拿走的 B 有 ${fmtT(B.trap)}，全知的 E 是 ${fmtT(E.trap)}。`,`Of the fleas still inside when the net is removed on day ${T}, ${pct(A.trap)} of A never get out, versus ${fmtT(C.trap)} for C (occasional probing), ${fmtT(D.trap)} for D (gives up after 2 hits), ${fmtT(B.trap)} for B (believes the net may be removed) and ${fmtT(E.trap)} for the all-knowing E. `);
+  else t+=tl(` 在第 ${T} 天之前，跳蚤都已经出去或死了，网被拿走这件事没有影响。把“网被拿走的日子”调早一些试试。`,`By day ${T} the fleas have already escaped or died, so removing the net changes nothing. Try an earlier removal day. `);
+  if(P.lhQ>0&&wStar!==null&&kStar)t+=tl(` B 放弃后过 ${wStar} 天，会觉得网可能已经没了，再试一次。`,`After giving up, B waits ${wStar} days, decides the net may be gone, and tries again.`);
   document.getElementById('lhNote').textContent=t;
 }
 function bandChart(id,pts,xMax,xLabel,markX){
@@ -859,9 +874,9 @@ function bandChart(id,pts,xMax,xLabel,markX){
   document.getElementById(id).outerHTML=s;
 }
 const lhCtl=document.getElementById('lhCtl'),LHC=[];
-[{id:'lhT',n:'网被拿走的日子',min:0,max:60,step:1,fmt:v=>'第 '+v+' 天'},
- {id:'lhMu',n:'起初以为网多密',min:0.1,max:0.9,step:0.1,fmt:pct},
- {id:'lhQ',n:'B 以为网每天被拿走的概率',min:0,max:0.05,step:0.005,fmt:v=>(v*100).toFixed(1)+'%'}].forEach(c=>{
+[{id:'lhT',n:tl('网被拿走的日子','Day the net is removed'),min:0,max:60,step:1,fmt:v=>tl('第 '+v+' 天','day '+v)},
+ {id:'lhMu',n:tl('起初以为网多密','Initial density guess'),min:0.1,max:0.9,step:0.1,fmt:pct},
+ {id:'lhQ',n:tl('B 以为网每天被拿走的概率','B’s daily removal belief'),min:0,max:0.05,step:0.005,fmt:v=>(v*100).toFixed(1)+'%'}].forEach(c=>{
   lhCtl.insertAdjacentHTML('beforeend',`<label for="c_${c.id}">${c.n}</label><input type="range" id="c_${c.id}" min="${c.min}" max="${c.max}" step="${c.step}"><output id="o_${c.id}"></output>`);
   const inp=document.getElementById('c_'+c.id);
   inp.addEventListener('input',()=>{P[c.id]=+inp.value;syncLh();clearTimeout(lhT0);lhT0=setTimeout(runLearn,120);});
@@ -893,7 +908,7 @@ function firstJump(so,net){
 }
 async function runScan(){
   const my=++scanJob,keep={...P},c=CTL.find(x=>x.id===scanParam);
-  const el=document.getElementById('scanList');el.innerHTML='<p class="note">扫描中…</p>';
+  const el=document.getElementById('scanList');el.innerHTML=tl('<p class="note">扫描中…</p>','<p class="note">Scanning…</p>');
   const xs=[];
   if(c.step>=1)for(let x=c.min;x<=c.max+1e-9;x+=c.step)xs.push(x);
   else{const n=Math.max(40,Math.round((c.max-c.min)/c.step));for(let i=0;i<=n;i++)xs.push(+(c.min+(c.max-c.min)*i/n).toFixed(5));}
@@ -915,16 +930,16 @@ async function runScan(){
     if(lifeJump||behav)jumps.push({i,A,B,kind:lifeJump?'life':'behav'});
   }
   drawScan(pts,jumps,c,keep[c.id]);
-  const fj=p=>p.fj?`第 ${p.fj.day} 天${ACT[p.fj.a].n}`:'不跳';
-  el.innerHTML=jumps.length?jumps.map(j=>`<div class="sj"><span class="chip" style="background:var(${j.kind==='life'?'--danger':'--mesh'})">${j.kind==='life'?'寿命突变':'行为翻转'}</span>`+
-    `<b>${c.n} ${c.fmt(j.A.x)} → ${c.fmt(j.B.x)}</b><span>寿命 ${j.A.V.toFixed(1)} → ${j.B.V.toFixed(1)} 天 · 逃出 ${pct(j.A.X)} → ${pct(j.B.X)} · 首跳 ${fj(j.A)} → ${fj(j.B)}</span>`+
-    `<button data-v="${j.B.x}">设成 ${c.fmt(j.B.x)}</button></div>`).join(''):
-    '<p class="note">在这个参数的整个范围里没有找到突变：寿命、逃出率和首跳日都是平滑变化的。换一个参数或换一组实验条件试试。</p>';
+  const fj=p=>p.fj?tl(`第 ${p.fj.day} 天${ACT[p.fj.a].n}`,`day ${p.fj.day} ${ACT[p.fj.a].n.toLowerCase()}`):tl('不跳','no jump');
+  el.innerHTML=jumps.length?jumps.map(j=>`<div class="sj"><span class="chip" style="background:var(${j.kind==='life'?'--danger':'--mesh'})">${j.kind==='life'?tl('寿命突变','Lifespan jump'):tl('行为翻转','Behavior flip')}</span>`+
+    `<b>${c.n} ${c.fmt(j.A.x)} → ${c.fmt(j.B.x)}</b><span>${tl(`寿命 ${j.A.V.toFixed(1)} → ${j.B.V.toFixed(1)} 天 · 逃出 ${pct(j.A.X)} → ${pct(j.B.X)} · 首跳 ${fj(j.A)} → ${fj(j.B)}`,`life ${j.A.V.toFixed(1)} → ${j.B.V.toFixed(1)} days · escape ${pct(j.A.X)} → ${pct(j.B.X)} · first jump ${fj(j.A)} → ${fj(j.B)}`)}</span>`+
+    `<button data-v="${j.B.x}">${tl('设成','Set to')} ${c.fmt(j.B.x)}</button></div>`).join(''):
+    tl('<p class="note">在这个参数的整个范围里没有找到突变：寿命、逃出率和首跳日都是平滑变化的。换一个参数或换一组实验条件试试。</p>','<p class="note">No tipping points across this parameter’s full range: lifespan, escape odds and first-jump day all change smoothly. Try another parameter or other conditions.</p>');
   el.querySelectorAll('button[data-v]').forEach(b=>b.onclick=()=>{P[c.id]=+b.dataset.v;markPreset(-1);sync();schedule(true);});
   const nL=jumps.filter(j=>j.kind==='life').length,nB=jumps.length-nL;
   document.getElementById('scanNote').textContent=jumps.length?
-    `找到 ${jumps.length} 处突变。`+(nL?`${nL} 处寿命突变：通常是“够不够得着”的门槛，能量、血量、天数都是整数，差一点就整个够不着。`:'')+
-    (nB?`${nB} 处行为翻转：两种做法在这里打平，最优选择整个换边，寿命却只是平滑变化。`:''):'';
+    tl(`找到 ${jumps.length} 处突变。`,`Found ${jumps.length} tipping point${jumps.length>1?'s':''}. `)+(nL?tl(`${nL} 处寿命突变：通常是“够不够得着”的门槛，能量、血量、天数都是整数，差一点就整个够不着。`,`${nL} lifespan jump${nL>1?'s':''}: usually a reachability threshold. Energy, health and days are whole numbers, so falling slightly short means missing completely. `):'')+
+    (nB?tl(`${nB} 处行为翻转：两种做法在这里打平，最优选择整个换边，寿命却只是平滑变化。`,`${nB} behavior flip${nB>1?'s':''}: two choices tie here, so the best choice switches completely while lifespan changes smoothly.`):''):'';
 }
 function drawScan(pts,jumps,c,cur){
   const W=640,L=44,R=44,T=12,H1=150,G=26,H2=70,B=30,H=T+H1+G+H2+B,iw=W-L-R;
@@ -936,7 +951,7 @@ function drawScan(pts,jumps,c,cur){
   jumps.forEach(j=>{const a=X(j.A.x),b=X(j.B.x);s+=`<rect x="${a}" y="${T}" width="${Math.max(2,b-a)}" height="${H1+G+H2}" fill="var(${j.kind==='life'?'--danger':'--mesh'})" opacity=".18"/>`;});
   for(let v=0;v<=top;v+=nice)s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${v}</text>`;
   for(const p of [0,0.5,1])s+=`<text x="${W-R+6}" y="${Y2(p)+3}">${p*100}%</text>`;
-  s+=`<text x="${L}" y="${T-2}">天</text><text x="${L}" y="${D0-6}">首跳在第几天（假设每跳都失败的路线）</text>`;
+  s+=`<text x="${L}" y="${T-2}">${tl('天','days')}</text><text x="${L}" y="${D0-6}">${tl('首跳在第几天（假设每跳都失败的路线）','First-jump day (on the path where every jump fails)')}</text>`;
   s+=`<line x1="${L}" x2="${W-R}" y1="${D0+H2}" y2="${D0+H2}" stroke="var(--line)"/><line x1="${L}" x2="${W-R}" y1="${D0}" y2="${D0}" stroke="var(--line)" stroke-dasharray="2 3"/>`;
   s+=`<text x="${L-6}" y="${D0+H2+3}" text-anchor="end">0</text><text x="${L-6}" y="${D0+3}" text-anchor="end">${dmax}</text>`;
   const tk=[x0,x0+(x1-x0)/4,x0+(x1-x0)/2,x0+3*(x1-x0)/4,x1];
@@ -963,14 +978,14 @@ function restartSim(){
   sim={s:learn?newLearnFlea():newFlea(NET),ev:null,t:0,x:JX0+60,y:JBOT-6,dur:1,flip:false,flash:0,outX:430,lastOpen:false,learn,pol:learn?LS.pols[LDEMO]:null,lsol:learn?(LDEMO==='B'?LS.LB:LS.LA):null};
   sim.lastOpen=simOpenNext(sim.s);
   crumbs=[];for(let i=0;i<P.F0;i++)crumbs.push({x:JX1-26-((i*37)%60)+Math.random()*6,y:JBOT-4-Math.floor(i/6)*5-Math.random()*2});
-  logEl.innerHTML='';log(`第 0 天：一只跳蚤醒来，能量 ${P.e0}，罐里有 ${P.F0} 份食物。`);
-  if(sim.learn)log(`演示 ${LDEMO} 型跳蚤：它不知道网有多密，网会在第 ${P.lhT} 天被悄悄拿走。`,'good');
+  logEl.innerHTML='';log(tl(`第 0 天：一只跳蚤醒来，能量 ${P.e0}，罐里有 ${P.F0} 份食物。`,`Day 0: a flea wakes up with ${P.e0} energy and ${P.F0} portions of food in the jar.`));
+  if(sim.learn)log(tl(`演示 ${LDEMO} 型跳蚤：它不知道网有多密，网会在第 ${P.lhT} 天被悄悄拿走。`,`Demo of flea ${LDEMO}: it doesn’t know the net density, and the net will be quietly removed on day ${P.lhT}.`),'good');
   hud();
 }
 function simOpenNext(s){return sim&&sim.learn?s.day>=P.lhT:trueOpen(s,NET);}
 function netText(s){
-  if(s.out)return '—';if(sim.learn)return s.day>=P.lhT?'没了（它不知道）':'还在';if(P.sched==='const')return '固定';
-  const o=trueOpen(s,NET);return (o?'开着':'关着')+(NET.blind?'（它看不见）':'');
+  if(s.out)return '—';if(sim.learn)return s.day>=P.lhT?tl('没了（它不知道）','gone (unknown to it)'):tl('还在','still there');if(P.sched==='const')return tl('固定','fixed');
+  const o=trueOpen(s,NET);return (o?tl('开着','open'):tl('关着','closed'))+(NET.blind?tl('（它看不见）',' (unseen)'):'');
 }
 function hud(){
   const s=sim.s;
@@ -984,27 +999,27 @@ function hud(){
   document.getElementById('bF').style.width=(P.F0?s.f/P.F0*100:0)+'%';
   markCur();
 }
-const NAMES={1:'轻跳',2:'中跳',3:'全力跳'};
+const NAMES={1:ACT[2].n,2:ACT[3].n,3:ACT[4].n};
 function nextEvent(){
   const s=sim.s;if(!s.alive){sim.ev=null;return;}
   const ev=sim.learn?stepLearn(s,sim.pol,P.lhT):stepFlea(s);sim.ev=ev;sim.t=0;sim.x0=sim.x;sim.y0=sim.y;
   sim.dur=s.out&&ev.t!=='escape'?260:700;
-  const d=`第 ${s.day} 天：`,tag=ev.open&&(sim.learn||P.sched!=='const')?(sim.learn?'（网其实已经没了）':'（网开着）'):'';
+  const d=tl(`第 ${s.day} 天：`,`Day ${s.day}: `),tag=ev.open&&(sim.learn||P.sched!=='const')?(sim.learn?tl('（网其实已经没了）',' (the net is actually gone)'):tl('（网开着）',' (net open)')):'';
   switch(ev.t){
-    case 'eat':log(d+`吃了一份食物，能量 → ${s.e}`);crumbs.pop();break;
-    case 'rest':log(d+'休息'+tag+(ev.healed?`，伤势好转，健康 → ${s.h}`:''),ev.healed?'good':'');break;
-    case 'hit':log(d+`${NAMES[ev.j]}${tag}，撞网！健康 → ${s.h}`,'bad');break;
-    case 'escape':log(d+`${NAMES[ev.j]}${tag}，钻出去了！`,'good');sim.dur=1100;break;
-    case 'hitDie':log(d+`${NAMES[ev.j]}撞网，伤重死亡。`,'bad');break;
-    case 'hitStarve':log(d+`${NAMES[ev.j]}撞网，力气耗尽而死。`,'bad');break;
-    case 'starve':log(d+'能量耗尽，饿死在罐里。','bad');break;
-    case 'die':log(d+'在罐里自然死亡。','bad');break;
-    case 'outHeal':log(d+`在外面养伤，健康 → ${s.h}`,'good');break;
-    case 'outLive':if(s.day%10===0)log(d+'在外面吃饱喝足。');break;
-    case 'dieOut':log(d+'在罐外寿终。');break;
+    case 'eat':log(d+tl(`吃了一份食物，能量 → ${s.e}`,`ate a portion, energy → ${s.e}`));crumbs.pop();break;
+    case 'rest':log(d+tl('休息','rested')+tag+(ev.healed?tl(`，伤势好转，健康 → ${s.h}`,`, healing, health → ${s.h}`):''),ev.healed?'good':'');break;
+    case 'hit':log(d+tl(`${NAMES[ev.j]}${tag}，撞网！健康 → ${s.h}`,`${NAMES[ev.j]}${tag}, hit the net! Health → ${s.h}`),'bad');break;
+    case 'escape':log(d+tl(`${NAMES[ev.j]}${tag}，钻出去了！`,`${NAMES[ev.j]}${tag}, got out!`),'good');sim.dur=1100;break;
+    case 'hitDie':log(d+tl(`${NAMES[ev.j]}撞网，伤重死亡。`,`${NAMES[ev.j]}, hit the net and died of its injuries.`),'bad');break;
+    case 'hitStarve':log(d+tl(`${NAMES[ev.j]}撞网，力气耗尽而死。`,`${NAMES[ev.j]}, hit the net and died of exhaustion.`),'bad');break;
+    case 'starve':log(d+tl('能量耗尽，饿死在罐里。','ran out of energy and starved in the jar.'),'bad');break;
+    case 'die':log(d+tl('在罐里自然死亡。','died of natural causes in the jar.'),'bad');break;
+    case 'outHeal':log(d+tl(`在外面养伤，健康 → ${s.h}`,`healing outside, health → ${s.h}`),'good');break;
+    case 'outLive':if(s.day%10===0)log(d+tl('在外面吃饱喝足。','eating well outside.'));break;
+    case 'dieOut':log(d+tl('在罐外寿终。','died of old age outside.'));break;
   }
-  if(s.alive&&!s.out){const o=simOpenNext(s);if(o!==sim.lastOpen&&(sim.learn||P.sched!=='const'))log(sim.learn?`第 ${s.day+1} 天：网被悄悄拿走了，跳蚤不知道。`:`第 ${s.day+1} 天：网${o?'打开了':'又关上了'}${NET.blind?'，但跳蚤看不见':''}`,o?'good':'');sim.lastOpen=o;}
-  if(!s.alive)log(`—— 一共活了 ${s.day} 天${s.out?`（第 ${s.escDay} 天越狱）`:''}。点“换一只跳蚤”再看一次。`,s.out?'good':'bad');
+  if(s.alive&&!s.out){const o=simOpenNext(s);if(o!==sim.lastOpen&&(sim.learn||P.sched!=='const'))log(sim.learn?tl(`第 ${s.day+1} 天：网被悄悄拿走了，跳蚤不知道。`,`Day ${s.day+1}: the net was quietly removed. The flea doesn’t know.`):tl(`第 ${s.day+1} 天：网${o?'打开了':'又关上了'}${NET.blind?'，但跳蚤看不见':''}`,`Day ${s.day+1}: the net ${o?'opened':'closed again'}${NET.blind?', but the flea can’t see it':''}`),o?'good':'');sim.lastOpen=o;}
+  if(!s.alive)log(tl(`—— 一共活了 ${s.day} 天${s.out?`（第 ${s.escDay} 天越狱）`:''}。点“换一只跳蚤”再看一次。`,`— Lived ${s.day} days${s.out?` (escaped on day ${s.escDay})`:''}. Click “New flea” to watch another.`),s.out?'good':'bad');
   hud();
 }
 const lerp=(a,b,t)=>a+(b-a)*t;
@@ -1047,8 +1062,8 @@ function draw(){
   ctx.fillStyle=C.food;ctx.globalAlpha=.55;
   for(let i=0;i<70;i++){const x=OUTX0+((i*53)%(OUTX1-OUTX0)),y=GROUND-2-((i*17)%9);ctx.beginPath();ctx.arc(x,y,2.2,0,7);ctx.fill();}
   ctx.globalAlpha=1;ctx.fillStyle=C.muted;ctx.font='12px '+css('--body');ctx.textAlign='center';
-  ctx.fillText('罐外 · 食物无限',(OUTX0+OUTX1)/2,GROUND+22);
-  ctx.fillText('罐内 · 食物有限',(JX0+JX1)/2,GROUND+22);
+  ctx.fillText(tl('罐外 · 食物无限','Outside · unlimited food'),(OUTX0+OUTX1)/2,GROUND+22);
+  ctx.fillText(tl('罐内 · 食物有限','Inside · limited food'),(JX0+JX1)/2,GROUND+22);
   ctx.fillStyle=C.glass;ctx.globalAlpha=.55;roundRect(JX0,JTOP,JX1-JX0,JBOT-JTOP+2,[4,4,18,18]);ctx.fill();ctx.globalAlpha=1;
   ctx.strokeStyle=C.mesh;ctx.lineWidth=2;roundRect(JX0,JTOP,JX1-JX0,JBOT-JTOP+2,[4,4,18,18]);ctx.stroke();
   ctx.fillStyle=C.mesh;ctx.fillRect(JX0-8,JTOP-6,JX1-JX0+16,7);
@@ -1069,10 +1084,10 @@ function draw(){
   if(sim&&sim.flash>0)sim.flash=Math.max(0,sim.flash-0.04*speed);
   ctx.fillStyle=open?C.food:C.muted;ctx.textAlign='left';ctx.font='11px '+css('--mono');
   const pr=j=>(passD(dens,j)*100|0)+'%';
-  const head=lm?(open?'网被拿走了':`网密度 ${pct(P.d)}（跳蚤不知道）`):P.sched==='const'?`网密度 ${pct(P.d)}`:open?(dens===0?'网被拿走了':`网开着 ${pct(dens)}`):`网关着 ${pct(dens)}`;
-  ctx.fillText(`${head} · 穿网率 轻${pr(1)} 中${pr(2)} 全力${pr(3)}`,JX0-8,JTOP-32);
-  if(lm&&!sim.s.out){ctx.fillStyle=C.muted;ctx.fillText(`它估计全力跳穿网率 ${pct(sim.lsol.pp(sim.s.k,sim.s.w,3))}，已撞网 ${sim.s.hits} 次`,JX0-8,JTOP-46);}
-  else if(NET&&NET.blind&&sim&&!sim.s.out){ctx.fillStyle=C.muted;ctx.fillText(`跳蚤看不见网；它估计网开着的概率 ${pct(sim.s.b)}`,JX0-8,JTOP-46);}
+  const head=lm?(open?tl('网被拿走了','Net removed'):tl(`网密度 ${pct(P.d)}（跳蚤不知道）`,`Net ${pct(P.d)} (flea doesn’t know)`)):P.sched==='const'?tl(`网密度 ${pct(P.d)}`,`Net density ${pct(P.d)}`):open?(dens===0?tl('网被拿走了','Net removed'):tl(`网开着 ${pct(dens)}`,`Net open ${pct(dens)}`)):tl(`网关着 ${pct(dens)}`,`Net closed ${pct(dens)}`);
+  ctx.fillText(tl(`${head} · 穿网率 轻${pr(1)} 中${pr(2)} 全力${pr(3)}`,`${head} · pass L ${pr(1)} M ${pr(2)} F ${pr(3)}`),JX0-8,JTOP-32);
+  if(lm&&!sim.s.out){ctx.fillStyle=C.muted;ctx.fillText(tl(`它估计全力跳穿网率 ${pct(sim.lsol.pp(sim.s.k,sim.s.w,3))}，已撞网 ${sim.s.hits} 次`,`It puts the full-jump pass rate at ${pct(sim.lsol.pp(sim.s.k,sim.s.w,3))}; hits so far: ${sim.s.hits}`),JX0-8,JTOP-46);}
+  else if(NET&&NET.blind&&sim&&!sim.s.out){ctx.fillStyle=C.muted;ctx.fillText(tl(`跳蚤看不见网；它估计网开着的概率 ${pct(sim.s.b)}`,`The flea can’t see the net; it puts the chance it is open at ${pct(sim.s.b)}`),JX0-8,JTOP-46);}
   ctx.fillStyle=C.food;crumbs.forEach(c=>{ctx.beginPath();ctx.arc(c.x,c.y,2.6,0,7);ctx.fill();});
   if(!sim)return;
   const [x,y]=fleaPos(),ev=sim.ev;
@@ -1090,7 +1105,7 @@ function drawFlea(x,y,dead,C){
   ctx.restore();
 }
 function roundRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h);}
-document.getElementById('btnPlay').onclick=e=>{playing=!playing;e.target.textContent=playing?'暂停':'继续';};
+document.getElementById('btnPlay').onclick=e=>{playing=!playing;e.target.textContent=playing?tl('暂停','Pause'):tl('继续','Resume');};
 document.getElementById('btnRestart').onclick=()=>restartSim();
 document.getElementById('speed').onchange=e=>speed=+e.target.value;
 
